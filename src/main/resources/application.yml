@@ -24,3 +24,10 @@ spring:
   docker:
     compose:
       enabled: false
+
+
+secureauth:
+  main:
+    user: ${SECUREAUTH_ADMIN_USER:}
+    email: ${SECUREAUTH_ADMIN_EMAIL:}
+    password: ${SECUREAUTH_ADMIN_PASSWORD:}

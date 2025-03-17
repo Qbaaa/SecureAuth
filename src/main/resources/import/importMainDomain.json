@@ -1,0 +1,29 @@
+{
+  "name": "master",
+  "accessTokenValidity": 300000,
+  "refreshTokenValidity":  600000,
+  "emailTokenValidity":  180000,
+  "sessionValidity":  3600000,
+  "roles": [
+    {
+      "name": "ADMIN",
+      "description": "Role Admin"
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "email": "admin@test.com",
+      "isActive": 1,
+      "isVerified": 1,
+      "password": {
+        "password": "admin"
+      },
+      "roles": [
+        {
+          "name": "ADMIN"
+        }
+      ]
+    }
+  ]
+}
