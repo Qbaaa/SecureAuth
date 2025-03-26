@@ -1,0 +1,15 @@
+@domainName = master
+##########################
+POST http://localhost:8080/auth/domains/{{domainName}}/token
+Accept: application/json
+Content-Type: application/json
+
+{
+  "type": "password",
+  "username": "superAdmin",
+  "password": "superAdmin"
+}
+
+> {%
+    client.global.set('token', response.body.accessToken);
+%}

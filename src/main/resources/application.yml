@@ -1,7 +1,10 @@
 server:
   port: 8080
+  forward-headers-strategy: native
 
 spring:
+  flyway:
+    enabled: false
   application:
     name: auth
 

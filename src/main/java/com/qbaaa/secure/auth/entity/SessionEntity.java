@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "session", schema = "secureauth")
@@ -24,7 +25,7 @@ public class SessionEntity extends AuditDataEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String sessionToken;
+    private UUID sessionToken;
 
     private String ipAddress;
 

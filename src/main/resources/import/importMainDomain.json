@@ -1,9 +1,9 @@
 {
   "name": "master",
-  "accessTokenValidity": 300000,
-  "refreshTokenValidity":  600000,
-  "emailTokenValidity":  180000,
-  "sessionValidity":  3600000,
+  "accessTokenValidity": 300,
+  "refreshTokenValidity":  600,
+  "emailTokenValidity":  180,
+  "sessionValidity":  3600,
   "roles": [
     {
       "name": "ADMIN",

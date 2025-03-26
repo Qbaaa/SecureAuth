@@ -37,7 +37,7 @@ public class RoleEntity extends AuditDataEntity {
 
     @ManyToMany
     @JoinTable(
-            name = "user_roles",
+            name = "user_role",
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )

@@ -3,7 +3,7 @@ package com.qbaaa.secure.auth.service;
 import com.qbaaa.secure.auth.dto.RoleTransferDto;
 import com.qbaaa.secure.auth.entity.DomainEntity;
 import com.qbaaa.secure.auth.entity.RoleEntity;
-import com.qbaaa.secure.auth.exception.RoleAlreadyExists;
+import com.qbaaa.secure.auth.exception.RoleAlreadyExistsException;
 import com.qbaaa.secure.auth.mapper.RoleImportMapper;
 import com.qbaaa.secure.auth.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class RoleService {
         var roles = new LinkedList<RoleEntity>();
         rolesImport.forEach(roleImport -> {
             if (roleRepository.existsByName(roleImport.name())) {
-                throw new RoleAlreadyExists(roleImport.name());
+                throw new RoleAlreadyExistsException(roleImport.name());
             }
             var roleEntity = roleRepository.save(roleImportMapper.mapRoleEntity(roleImport, domain));
             roles.add(roleEntity);
