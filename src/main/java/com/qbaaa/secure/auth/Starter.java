@@ -32,14 +32,13 @@ public class Starter implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-
         try {
             var jsonContent = loadJsonDomain("import/importMainDomain.json");
             var domainDto = changeConfigurationDomain(jsonContent);
-            domainImportService.importDomain(domainDto);
+            domainImportService.importDomainStartApplication(domainDto);
             log.info("Created Main Domain");
         } catch (DomainImportException e) {
-            log.warn("Main Domain interrupted, Domain exists {}", e.getMessage());
+            log.warn("Main Domain interrupted, {}", e.getMessage());
         }
 
     }

@@ -2,6 +2,19 @@ server:
   port: 8080
   forward-headers-strategy: native
 
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    config-url: /api-secure-auth-backend/swagger-config
+    disable-swagger-default-url: true
+    url: /api-secure-auth-backend
+  api-docs:
+    enabled: true
+    path: /api-secure-auth-backend
+
 spring:
   flyway:
     enabled: false

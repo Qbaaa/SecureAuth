@@ -15,6 +15,8 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 public class WebSecurityConfig {
 
     private static final AntPathRequestMatcher[] WHITE_LIST = {
+            antMatcher("/swagger-ui/**"),
+            antMatcher("/api-secure-auth-backend/**"),
             antMatcher("/auth/domains/**/token"),
             antMatcher("/auth/domains/**/register")
     };

@@ -1,8 +1,10 @@
 package com.qbaaa.secure.auth.exception.rest;
 
 import com.qbaaa.secure.auth.exception.DomainExistsException;
+import com.qbaaa.secure.auth.exception.InputInvalidException;
 import com.qbaaa.secure.auth.exception.LoginException;
 import com.qbaaa.secure.auth.exception.RestErrorCodeType;
+import com.qbaaa.secure.auth.exception.UnSupportedFileException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,22 @@ import java.util.UUID;
 public class RestResponseEntityExceptionHandler {
 
     private static final String SERVER_ERROR_LOG = "SERVER ERROR, uuid: {}, uri: {}";
+
+    @ExceptionHandler(InputInvalidException.class)
+    ResponseEntity<ErrorDetails> handleInputInvalidException(InputInvalidException ex, HttpServletRequest request) {
+        var errorCodeType = RestErrorCodeType.INPUT_VALIDATION;
+        var errorDetails = buildErrorDetails(errorCodeType.getErrorType(), ex.getMessage());
+        log.error(SERVER_ERROR_LOG, errorDetails.uuid(), request.getRequestURI(), ex);
+        return ResponseEntity.status(errorCodeType.getHttpStatus()).body(errorDetails);
+    }
+
+    @ExceptionHandler(UnSupportedFileException.class)
+    ResponseEntity<ErrorDetails> handleUnSupportedFileException(UnSupportedFileException ex, HttpServletRequest request) {
+        var errorCodeType = RestErrorCodeType.UN_SUPPORTED_FILE;
+        var errorDetails = buildErrorDetails(errorCodeType.getErrorType(), ex.getMessage());
+        log.error(SERVER_ERROR_LOG, errorDetails.uuid(), request.getRequestURI(), ex);
+        return ResponseEntity.status(errorCodeType.getHttpStatus()).body(errorDetails);
+    }
 
     @ExceptionHandler(LoginException.class)
     ResponseEntity<ErrorDetails> handleLoginException(LoginException ex, HttpServletRequest request) {
