@@ -48,10 +48,9 @@ public class DomainImportService {
         }
     }
 
-
     private void importJsonDomain(DomainTransferDto domainDto) {
         if (domainrepository.existsByName(domainDto.name())) {
-            throw new DomainExistsException(domainDto.name());
+            throw new DomainExistsException("Domain already exists " + domainDto.name());
         }
 
         var domainEntity = domainrepository.save(domainImportMapper.mapDomainEntity(domainDto));

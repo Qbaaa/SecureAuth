@@ -6,23 +6,22 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<UserEntity, Long> {
+public interface UserRepositoryTest extends JpaRepository<UserEntity, Long> {
 
     @Query("""
-                select (count(u) > 0)
+                select count(u)
                 from UserEntity u
                 where u.domain.name = :domainName
-                and (u.username = :username or u.email = :email)
-               """)
-    boolean existsUserInDomain(String domainName, String username, String email);
+                """)
+    long countByDomainName(String domainName);
 
     @Query("""
                 select u
                 from UserEntity u
-                join fetch u.roles r
+                left join fetch u.roles r
                 where u.domain.name = :domainName
                 and u.username = :username
                 """)
-    Optional<UserEntity> findUserInDomain(String domainName, String username);
+    Optional<UserEntity> findByDomainNameAndUsername(String domainName, String username);
 
 }

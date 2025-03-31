@@ -1,5 +1,6 @@
 package com.qbaaa.secure.auth.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +11,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +19,11 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "role", schema = "secureauth")
+@Table(
+        name = "role",
+        schema = "secureauth",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"domain_id", "name"})
+)
 @Getter
 @Setter
 public class RoleEntity extends AuditDataEntity {
@@ -26,7 +32,7 @@ public class RoleEntity extends AuditDataEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
 
     private String description;
@@ -35,7 +41,7 @@ public class RoleEntity extends AuditDataEntity {
     @JoinColumn(name = "domain_id", nullable = false)
     private DomainEntity domain;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(name = "role_id"),

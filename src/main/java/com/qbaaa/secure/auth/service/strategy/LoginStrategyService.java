@@ -31,7 +31,7 @@ public class LoginStrategyService extends AuthStrategy {
     public TokenResponse authenticate(String domainName, String baseUrl, AuthRequest request) {
         var login = (LoginRequest) request;
 
-        var userOpt = userService.findByUsername(login.getUsername());
+        var userOpt = userService.findUserInDomain(domainName, login.getUsername());
         if (userOpt.isEmpty()) {
             throw new LoginException("Bad username or password");
         }

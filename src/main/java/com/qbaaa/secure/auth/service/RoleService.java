@@ -23,8 +23,10 @@ public class RoleService {
 
         var roles = new LinkedList<RoleEntity>();
         rolesImport.forEach(roleImport -> {
-            if (roleRepository.existsByName(roleImport.name())) {
-                throw new RoleAlreadyExistsException(roleImport.name());
+            if (roleRepository.existsRole(domain.getName(), roleImport.name())) {
+                throw new RoleAlreadyExistsException(
+                        String.format("Role already exists %s in domainName: %s", roleImport.name(), domain.getName())
+                );
             }
             var roleEntity = roleRepository.save(roleImportMapper.mapRoleEntity(roleImport, domain));
             roles.add(roleEntity);

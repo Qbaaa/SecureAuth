@@ -7,9 +7,23 @@ Content-Type: application/json
 {
   "type": "password",
   "username": "superAdmin",
-  "password": "superAdmin"
+  "password": "superAdminPassword"
 }
 
 > {%
     client.global.set('token', response.body.accessToken);
 %}
+
+
+##########################
+POST http://localhost:8080/domains/upload
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=boundary123
+
+--boundary123
+Content-Disposition: form-data; name="file"; filename="importDomainTest.json"
+Content-Type: application/json
+
+< D:/jakub/Desktop/PredictStock/secureauth/src/test/resources/upload/importDomainTest.json
+--boundary123--
+

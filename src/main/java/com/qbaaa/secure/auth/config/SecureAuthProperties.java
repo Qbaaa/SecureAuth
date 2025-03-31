@@ -12,12 +12,17 @@ import org.springframework.stereotype.Component;
 @Setter
 public class SecureAuthProperties {
 
+    private String domain;
     private String user;
     private String email;
     private String password;
 
     @PostConstruct
     public void checkConfig() {
+        if (domain.isEmpty()) {
+            domain = null;
+        }
+
         if (user.isEmpty()) {
             user = null;
         }

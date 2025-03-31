@@ -50,10 +50,17 @@ public class Starter implements ApplicationRunner {
     }
 
     private DomainTransferDto changeConfigurationDomain(String domainJson) throws JsonProcessingException {
-        JsonNode jsonNode = objectMapper.readTree(domainJson);
+        var jsonNode = objectMapper.readTree(domainJson);
 
-        ArrayNode usersArray = (ArrayNode) jsonNode.get("users");
-        if (usersArray != null && usersArray.size() > 0) {
+        var domainProperties = secureAuthProperties.getDomain();
+        Optional.ofNullable(domainProperties).ifPresent(domain -> {
+            if (jsonNode instanceof ObjectNode objectNode) {
+                objectNode.put("name", domain);
+            }
+        });
+
+        var usersArray = (ArrayNode) jsonNode.get("users");
+        if (usersArray != null && !usersArray.isEmpty()) {
             ObjectNode firstUser = (ObjectNode) usersArray.get(0);
 
             var userProperties = secureAuthProperties.getUser();
@@ -64,7 +71,7 @@ public class Starter implements ApplicationRunner {
             Optional.ofNullable(emailProperties).ifPresent(email ->
                     firstUser.put("email", emailProperties));
 
-            ObjectNode passwordNode = (ObjectNode) firstUser.get("password");
+            var passwordNode = (ObjectNode) firstUser.get("password");
             if (passwordNode != null) {
                 var passwordProperties = secureAuthProperties.getPassword();
                 Optional.ofNullable(passwordProperties).ifPresent(password ->

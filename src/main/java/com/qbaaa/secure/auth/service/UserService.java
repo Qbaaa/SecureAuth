@@ -29,8 +29,8 @@ public class UserService {
             var assignRolesToUser = rolesDomain.stream()
                     .filter(roleDomain -> userImportRoles.contains(roleDomain.getName()))
                     .toList();
-            if (userRepository.existsByUsernameOrEmail(userImport.username(), userImport.email())) {
-                throw new UserAlreadyExistsException(userImport.username(), userImport.email());
+            if (userRepository.existsUserInDomain(domain.getName(), userImport.username(), userImport.email())) {
+                throw new UserAlreadyExistsException(userImport.username(), userImport.email(), domain.getName());
             }
             var userEntity = userRepository.save(userImportMapper.mapUserEntity(userImport, domain, assignRolesToUser));
 
@@ -39,8 +39,8 @@ public class UserService {
 
     }
 
-    public Optional<UserEntity> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public Optional<UserEntity> findUserInDomain(String domainName, String username) {
+        return userRepository.findUserInDomain(domainName, username);
     }
 
 }

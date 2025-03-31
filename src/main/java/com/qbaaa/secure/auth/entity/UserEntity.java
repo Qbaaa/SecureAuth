@@ -7,11 +7,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +21,14 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "user", schema = "secureauth")
+@Table(
+        name = "user",
+        schema = "secureauth",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"domain_id", "username"}),
+                @UniqueConstraint(columnNames = {"domain_id", "email"})
+        }
+)
 @Getter
 @Setter
 public class UserEntity extends AuditDataEntity {
@@ -28,10 +37,10 @@ public class UserEntity extends AuditDataEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String username;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     private Boolean isActive;
@@ -54,7 +63,12 @@ public class UserEntity extends AuditDataEntity {
     @OneToMany(mappedBy = "user")
     private List<SessionEntity> sessions;
 
-    @ManyToMany(mappedBy = "users")
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(
+            name = "user_role",
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     private List<RoleEntity> roles;
 
     @Override

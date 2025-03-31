@@ -28,6 +28,20 @@
           "name": "ADMIN"
         }
       ]
+    },
+    {
+      "username": "user001",
+      "email": "user001@test.com",
+      "isActive": 1,
+      "isVerified": 1,
+      "password": {
+        "password": "userPassword"
+      },
+      "roles": [
+        {
+          "name": "USER"
+        }
+      ]
     }
   ]
 }

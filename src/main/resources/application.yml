@@ -17,7 +17,11 @@ springdoc:
 
 spring:
   flyway:
-    enabled: false
+    baseline-on-migrate: true
+    enabled: true
+    out-of-order: true
+    schemas: secureauth
+    locations: classpath:db/migration
   application:
     name: auth
 
@@ -44,6 +48,7 @@ spring:
 
 secureauth:
   main:
+    domain: ${SECURE_MAIN_DOMAIN:master}
     user: ${SECUREAUTH_ADMIN_USER:}
     email: ${SECUREAUTH_ADMIN_EMAIL:}
     password: ${SECUREAUTH_ADMIN_PASSWORD:}
