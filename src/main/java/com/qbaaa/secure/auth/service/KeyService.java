@@ -13,6 +13,7 @@ import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
@@ -43,9 +44,21 @@ public class KeyService {
     public RSAPrivateKey getPrivateKey(String domainName) {
         try {
             var keyData = keyRepository.findPrivateKeyByDomainName(domainName)
-                    .orElseThrow(() -> new EntityNotFoundException("PrivateKey for domain " + domainName));
+                    .orElseThrow(() -> new EntityNotFoundException("Private key not found for domain " + domainName));
 
             return GenerateRsaKey.getPrivateKey(keyData);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new GenerateKeyException(e.getMessage());
+        }
+
+    }
+
+    public RSAPublicKey getPublicKey(String domainName) {
+        try {
+            var keyData = keyRepository.findPublicKeyByDomainName(domainName)
+                    .orElseThrow(() -> new EntityNotFoundException("Public key not found for domain " + domainName));
+
+            return GenerateRsaKey.getPublicKey(keyData);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new GenerateKeyException(e.getMessage());
         }

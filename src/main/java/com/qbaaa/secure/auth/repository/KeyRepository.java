@@ -14,4 +14,11 @@ public interface KeyRepository extends JpaRepository<KeyEntity, Long> {
                 where k.domain.name = :name
                 """)
     Optional<String> findPrivateKeyByDomainName(String name);
+
+    @Query("""
+                select k.publicKey
+                from KeyEntity k
+                where k.domain.name = :name
+                """)
+    Optional<String> findPublicKeyByDomainName(String name);
 }

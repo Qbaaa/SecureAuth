@@ -4,6 +4,7 @@ import com.qbaaa.secure.auth.dto.AuthRequest;
 import com.qbaaa.secure.auth.dto.LoginRequest;
 import com.qbaaa.secure.auth.dto.TokenResponse;
 import com.qbaaa.secure.auth.service.strategy.AuthStrategy;
+import com.qbaaa.secure.auth.util.UrlUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class AuthController {
                                                HttpServletRequest request) {
 
         var type = authRequest.getType();
-        var baseUrl = getBaseUrl(request);
+        var baseUrl = UrlUtil.getBaseUrl(request);
         var token = authStrategies.get(type.getValue())
                 .authenticate(domainName, baseUrl, authRequest);
        return ResponseEntity.ok(token);
@@ -45,13 +46,5 @@ public class AuthController {
 //
 //        return ResponseEntity.ok().build();
 //    }
-
-    private String getBaseUrl(HttpServletRequest request) {
-        String scheme = request.getScheme();
-        String host = request.getServerName();
-        int port = request.getServerPort();
-
-        return scheme + "://" + host + (port == 80 || port == 443 ? "" : ":" + port);
-    }
 
 }
