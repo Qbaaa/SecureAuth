@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
@@ -24,5 +25,15 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
                 and u.username = :username
                 """)
     Optional<UserEntity> findUserInDomain(String domainName, String username);
+
+    @Query("""
+                select u
+                from UserEntity u
+                left join fetch u.roles r
+                inner join u.sessions sessions
+                where sessions.sessionToken = :sessionToken
+                """)
+    Optional<UserEntity> findBySessions(UUID sessionToken);
+
 
 }

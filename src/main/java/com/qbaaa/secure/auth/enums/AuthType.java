@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum AuthType {
 
     PASSWORD("password"),
-    REFRESH_TOKEN("refreshToken");
+    REFRESH_TOKEN("refresh-token");
 
     private final String value;
 }

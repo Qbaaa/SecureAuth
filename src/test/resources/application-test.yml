@@ -6,7 +6,7 @@ spring:
     enabled: true
     out-of-order: true
     schemas: secureauth
-    locations: classpath:test/db/migration
+    locations: classpath:test/db/migration, classpath:db/migration
   jpa:
     hibernate:
       ddl-auto: none

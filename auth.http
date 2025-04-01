@@ -11,13 +11,28 @@ Content-Type: application/json
 }
 
 > {%
-    client.global.set('token', response.body.accessToken);
+    client.global.set('accessToken', response.body.accessToken);
+    client.global.set('refreshToken', response.body.refreshToken)
 %}
 
+##########################
+POST http://localhost:8080/auth/domains/{{domainName}}/token
+Accept: application/json
+Content-Type: application/json
+
+{
+  "type": "refresh-token",
+  "token": "{{refreshToken}}"
+}
+
+> {%
+    client.global.set('accessToken', response.body.accessToken);
+    client.global.set('refreshToken', response.body.refreshToken)
+%}
 
 ##########################
 POST http://localhost:8080/domains/upload
-Authorization: Bearer {{token}}
+Authorization: Bearer {{accessToken}}
 Content-Type: multipart/form-data; boundary=boundary123
 
 --boundary123
@@ -26,4 +41,5 @@ Content-Type: application/json
 
 < D:/jakub/Desktop/PredictStock/secureauth/src/test/resources/upload/importDomainTest.json
 --boundary123--
+
 

@@ -7,9 +7,9 @@ import com.qbaaa.secure.auth.exception.DomainExistsException;
 import com.qbaaa.secure.auth.exception.DomainImportException;
 import com.qbaaa.secure.auth.mapper.DomainImportMapper;
 import com.qbaaa.secure.auth.repository.DomainRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.charset.StandardCharsets;

@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -24,6 +25,14 @@ import java.util.UUID;
 public class RestResponseEntityExceptionHandler {
 
     private static final String SERVER_ERROR_LOG = "SERVER ERROR, uuid: {}, uri: {}";
+
+    @ExceptionHandler(BadCredentialsException.class)
+    ResponseEntity<ErrorDetails> handleBadCredentialsException(BadCredentialsException ex, HttpServletRequest request) {
+        var errorCodeType = RestErrorCodeType.CREDENTIALS_INVALIDATION;
+        var errorDetails = buildErrorDetails(errorCodeType.getErrorType(), ex.getMessage());
+        log.error(SERVER_ERROR_LOG, errorDetails.uuid(), request.getRequestURI(), ex);
+        return ResponseEntity.status(errorCodeType.getHttpStatus()).body(errorDetails);
+    }
 
     @ExceptionHandler(InputInvalidException.class)
     ResponseEntity<ErrorDetails> handleInputInvalidException(InputInvalidException ex, HttpServletRequest request) {
@@ -43,7 +52,7 @@ public class RestResponseEntityExceptionHandler {
 
     @ExceptionHandler(LoginException.class)
     ResponseEntity<ErrorDetails> handleLoginException(LoginException ex, HttpServletRequest request) {
-        var errorCodeType = RestErrorCodeType.LOGIN_INVALIDATION;
+        var errorCodeType = RestErrorCodeType.CREDENTIALS_INVALIDATION;
         var errorDetails = buildErrorDetails(errorCodeType.getErrorType(), ex.getMessage());
         log.error(SERVER_ERROR_LOG, errorDetails.uuid(), request.getRequestURI(), ex);
         return ResponseEntity.status(errorCodeType.getHttpStatus()).body(errorDetails);

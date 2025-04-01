@@ -1,7 +1,6 @@
 package com.qbaaa.secure.auth.repository;
 
 import com.qbaaa.secure.auth.entity.RefreshTokenEntity;
-import com.qbaaa.secure.auth.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -14,5 +13,6 @@ public interface RefreshTokenRepositoryTest extends JpaRepository<RefreshTokenEn
                 """)
     long countByUsername(String username);
 
-    String user(UserEntity user);
+    boolean existsByToken(String token);
+
 }

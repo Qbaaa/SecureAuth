@@ -4,13 +4,13 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.qbaaa.secure.auth.config.time.TimeProvider;
 import com.qbaaa.secure.auth.dto.ClaimJwtDto;
 import com.qbaaa.secure.auth.service.KeyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.Optional;
 
 @Slf4j
@@ -19,6 +19,7 @@ import java.util.Optional;
 public class JwtService {
 
     private final KeyService keyService;
+    private final TimeProvider timeProvider;
 
     private static final String CLAIM_ROLES = "roles";
     private static final String CLAIM_USERNAME = "username";
@@ -29,6 +30,7 @@ public class JwtService {
     public String createAccessToken(ClaimJwtDto claimJwt) {
         var privateKey = keyService.getPrivateKey(claimJwt.domainName());
         var algorithm = Algorithm.RSA256(null, privateKey);
+        var timestamp = timeProvider.getTimestamp();
 
         return JWT.create()
                 .withIssuer(claimJwt.baseUrl() + "/auth/domains/" + claimJwt.domainName())
@@ -37,17 +39,19 @@ public class JwtService {
                 .withClaim(CLAIM_SESSION, claimJwt.session())
                 .withClaim(CLAIM_ROLES, claimJwt.roles())
                 .withClaim(CLAIM_DOMAIN, claimJwt.domainName())
-                .withExpiresAt(Instant.now().plusSeconds(claimJwt.accessTokenValidity()))
+                .withExpiresAt(timestamp.plusSeconds(claimJwt.accessTokenValidity()))
                 .sign(algorithm);
     }
 
-    public String createRefreshToken(String domainName, String session, Integer refreshTokenValidity) {
+    public String createRefreshToken(String baseUrl, String domainName, String session, Integer refreshTokenValidity) {
         var privateKey = keyService.getPrivateKey(domainName);
         var algorithm = Algorithm.RSA256(null, privateKey);
+        var timestamp = timeProvider.getTimestamp();
 
         return JWT.create()
+                .withIssuer(baseUrl + "/auth/domains/" + domainName)
                 .withClaim(CLAIM_SESSION, session)
-                .withExpiresAt(Instant.now().plusSeconds(refreshTokenValidity))
+                .withExpiresAt(timestamp.plusSeconds(refreshTokenValidity))
                 .sign(algorithm);
     }
 

@@ -161,7 +161,7 @@ class LoginUserTestIT {
                         Assertions.assertNotNull(errorResponse);
                         assertAll(
                                 "CHECK API RESPONSE",
-                                () -> Assertions.assertEquals(RestErrorCodeType.LOGIN_INVALIDATION.getErrorType(), errorResponse.code())
+                                () -> Assertions.assertEquals(RestErrorCodeType.CREDENTIALS_INVALIDATION.getErrorType(), errorResponse.code())
                         );
                     });
 

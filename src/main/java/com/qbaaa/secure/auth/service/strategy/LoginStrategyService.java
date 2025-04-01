@@ -12,9 +12,9 @@ import com.qbaaa.secure.auth.service.PasswordService;
 import com.qbaaa.secure.auth.service.RefreshTokenService;
 import com.qbaaa.secure.auth.service.SessionServer;
 import com.qbaaa.secure.auth.service.UserService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("password")
 @RequiredArgsConstructor
@@ -47,7 +47,7 @@ public class LoginStrategyService extends AuthStrategy {
         final var claimJwtDto = new ClaimJwtDto(domainName, user.getUsername(), user.getEmail(),
                 roles, baseUrl, session.getSessionToken().toString(), configDomain.getAccessTokenValidity());
         final var accessToken = jwtService.createAccessToken(claimJwtDto);
-        final var refreshToken = jwtService.createRefreshToken(domainName, session.getSessionToken().toString(),
+        final var refreshToken = jwtService.createRefreshToken(baseUrl, domainName, session.getSessionToken().toString(),
                 configDomain.getRefreshTokenValidity());
         refreshTokenService.createRefreshToken(user, configDomain.getRefreshTokenValidity(), refreshToken);
 
