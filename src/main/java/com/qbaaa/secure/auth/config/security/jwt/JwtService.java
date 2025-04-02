@@ -27,13 +27,15 @@ public class JwtService {
     private static final String CLAIM_SESSION = "session";
     private static final String CLAIM_DOMAIN = "domain";
 
+    private static final String PREFIX_ISSUER = "/domains/";
+
     public String createAccessToken(ClaimJwtDto claimJwt) {
         var privateKey = keyService.getPrivateKey(claimJwt.domainName());
         var algorithm = Algorithm.RSA256(null, privateKey);
         var timestamp = timeProvider.getTimestamp();
 
         return JWT.create()
-                .withIssuer(claimJwt.baseUrl() + "/auth/domains/" + claimJwt.domainName())
+                .withIssuer(claimJwt.baseUrl() + PREFIX_ISSUER + claimJwt.domainName())
                 .withClaim(CLAIM_USERNAME, claimJwt.username())
                 .withClaim(CLAIM_EMAIL, claimJwt.email())
                 .withClaim(CLAIM_SESSION, claimJwt.session())
@@ -49,7 +51,7 @@ public class JwtService {
         var timestamp = timeProvider.getTimestamp();
 
         return JWT.create()
-                .withIssuer(baseUrl + "/auth/domains/" + domainName)
+                .withIssuer(baseUrl + PREFIX_ISSUER + domainName)
                 .withClaim(CLAIM_SESSION, session)
                 .withExpiresAt(timestamp.plusSeconds(refreshTokenValidity))
                 .sign(algorithm);

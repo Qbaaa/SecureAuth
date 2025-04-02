@@ -31,8 +31,8 @@ public class WebSecurityConfig {
     private static final AntPathRequestMatcher[] WHITE_LIST = {
             antMatcher("/swagger-ui/**"),
             antMatcher("/api-secure-auth-backend/**"),
-            antMatcher("/auth/domains/*/token"),
-            antMatcher("/auth/domains/*/register")
+            antMatcher("/domains/*/auth/token"),
+            antMatcher("/domains/*/auth/register")
     };
 
     @Bean
@@ -57,9 +57,9 @@ public class WebSecurityConfig {
                         authorize ->
                                 authorize
                                         .requestMatchers(WHITE_LIST).permitAll()
-                                        .requestMatchers("/domains/upload")
+                                        .requestMatchers("/admin/domains")
                                         .hasRole("master__" + Role.ADMIN.name())
-                                        .requestMatchers("/auth/domains/*/logout").authenticated()
+                                        .requestMatchers("/domains/*/auth/logout").authenticated()
                                         .anyRequest().authenticated()
                 )
                 .sessionManagement(

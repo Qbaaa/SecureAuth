@@ -34,7 +34,7 @@ public class RefreshTokenStrategyService extends AuthStrategy {
     public TokenResponse authenticate(String domainName, String baseUrl, AuthRequest request) {
         var refreshTokenRequest = (RefreshTokenRequest) request;
         var refreshTokenOld = refreshTokenRequest.getToken();
-        var issuer = baseUrl + "/auth/domains/" + domainName;
+        var issuer = baseUrl + "/domains/" + domainName;
         if (!refreshTokenService.existsRefreshToken(refreshTokenOld)) {
             throw new BadCredentialsException("Refresh token not found");
         }

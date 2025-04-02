@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/domains")
+@RequestMapping("/admin/domains")
 @RequiredArgsConstructor
 @Tag(name = "Domain API")
 public class DomainController {
@@ -25,7 +25,7 @@ public class DomainController {
     private final FileUploadValidator fileUploadValidator;
 
     @Operation(summary = "Imports a domain based on the uploaded file", security = @SecurityRequirement(name = "Authorization"))
-    @PostMapping(value ="upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Void> importDomain(@RequestPart(value = "file") MultipartFile fileUpload) {
 
         if (!fileUploadValidator.validate(fileUpload)) {

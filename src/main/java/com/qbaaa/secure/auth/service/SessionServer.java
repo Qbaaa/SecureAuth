@@ -36,11 +36,15 @@ public class SessionServer {
         if (sessionRepository.existsActiveSession(sessionToken, LocalDateTime.now())) {
             return true;
         }
+        delete(sessionToken);
+        return false;
+    }
+
+    public void delete(UUID sessionToken) {
         var deleteNumberSession = sessionRepository.deleteBySessionToken(sessionToken);
         if (deleteNumberSession < 0) {
             log.warn("Failed to delete session");
         }
         log.info("Successfully deleted session, number of deleted: {}", deleteNumberSession);
-        return false;
     }
 }

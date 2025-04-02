@@ -25,6 +25,7 @@ import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 public class CustomJwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String TOKEN_PREFIX = "Bearer ";
+    private static final String PREFIX_ISSUER = "/domains/";
 
     private final SecureAuthProperties secureAuthProperties;
     private final AuthenticationConfiguration authenticationConfiguration;
@@ -37,7 +38,10 @@ public class CustomJwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(authHeader) && authHeader.startsWith(TOKEN_PREFIX)) {
             var token = authHeader.substring(TOKEN_PREFIX.length());
             var baseUrl = UrlUtil.getBaseUrl(request);
-            var issuer = baseUrl + "/auth/domains/" + secureAuthProperties.getDomain();
+            var issuer = baseUrl + PREFIX_ISSUER + secureAuthProperties.getDomain();
+            if (request.getRequestURL().toString().startsWith(baseUrl + PREFIX_ISSUER)) {
+                issuer = UrlUtil.extractDomain(request);
+            }
 
             var customJwtAuthentication = CustomJwtAuthenticationToken.unauthenticated(token, issuer);
             try {

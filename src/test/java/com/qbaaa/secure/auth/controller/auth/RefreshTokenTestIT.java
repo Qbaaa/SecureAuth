@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @ActiveProfiles("test")
 class RefreshTokenTestIT {
 
-    private static final String API_POST_REFRESH_TOKEN = "/auth/domains/{domainName}/token";
+    private static final String API_POST_REFRESH_TOKEN = "/domains/{domainName}/auth/token";
 
     @Autowired
     private FakeTimeProvider fakeTimeProvider;

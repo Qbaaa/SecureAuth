@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 class ImportDomainTestIT {
 
-    private static final String API_POST_IMPORT_DOMAIN = "/domains/upload";
+    private static final String API_POST_IMPORT_DOMAIN = "/admin/domains";
 
     @Autowired
     private MockMvc mockMvc;

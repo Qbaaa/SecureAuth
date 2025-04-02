@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @ActiveProfiles("test")
 class LoginUserTestIT {
 
-    private static final String API_POST_LOGIN = "/auth/domains/{domainName}/token";
+    private static final String API_POST_LOGIN = "/domains/{domainName}/auth/token";
 
     @Autowired
     private MockMvc mockMvc;
