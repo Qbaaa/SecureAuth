@@ -19,9 +19,12 @@ public interface UserRepositoryTest extends JpaRepository<UserEntity, Long> {
                 select u
                 from UserEntity u
                 left join fetch u.roles r
+                join fetch u.password
                 where u.domain.name = :domainName
                 and u.username = :username
                 """)
     Optional<UserEntity> findByDomainNameAndUsername(String domainName, String username);
+
+
 
 }

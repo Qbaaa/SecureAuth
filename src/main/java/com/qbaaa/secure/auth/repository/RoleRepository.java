@@ -4,6 +4,8 @@ import com.qbaaa.secure.auth.entity.RoleEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface RoleRepository extends JpaRepository<RoleEntity, Long> {
 
     @Query("""
@@ -13,4 +15,7 @@ public interface RoleRepository extends JpaRepository<RoleEntity, Long> {
             and r.name = :name
             """)
     boolean existsRole(String domainName, String name);
+
+    List<RoleEntity> findByDomainNameAndIsDefault(String name, Boolean isDefault);
+
 }

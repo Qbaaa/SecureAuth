@@ -37,6 +37,10 @@ public class DomainEntity extends AuditDataEntity {
 
     private Integer sessionValidity;
 
+    private Boolean isEnabledRegister = Boolean.FALSE;
+
+    private Boolean isEnabledVerifiedEmail = Boolean.FALSE;
+
     @OneToMany(mappedBy = "domain", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<UserEntity> users = new ArrayList<>();
 

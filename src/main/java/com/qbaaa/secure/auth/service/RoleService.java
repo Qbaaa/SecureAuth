@@ -34,4 +34,8 @@ public class RoleService {
         return roles;
     }
 
+    List<RoleEntity> getRolesToRegisterUser(String domainName) {
+        return roleRepository.findByDomainNameAndIsDefault(domainName, true);
+    }
+
 }

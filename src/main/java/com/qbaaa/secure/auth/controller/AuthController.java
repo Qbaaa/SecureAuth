@@ -2,6 +2,7 @@ package com.qbaaa.secure.auth.controller;
 
 import com.qbaaa.secure.auth.dto.AuthRequest;
 import com.qbaaa.secure.auth.dto.RefreshTokenRequest;
+import com.qbaaa.secure.auth.dto.RegisterRequest;
 import com.qbaaa.secure.auth.dto.TokenResponse;
 import com.qbaaa.secure.auth.service.AuthService;
 import com.qbaaa.secure.auth.service.strategy.AuthStrategy;
@@ -36,11 +37,11 @@ public class AuthController {
 
     }
 
-//    @PostMapping("/register")
-//    public ResponseEntity<Void> register(@PathVariable String domainName, @RequestBody RegisterRequest registerRequest) {
-//
-//        return ResponseEntity.ok().build();
-//    }
+    @PostMapping("/register")
+    public ResponseEntity<Void> register(@PathVariable String domainName, @RequestBody RegisterRequest registerRequest) {
+        authService.register(domainName, registerRequest);
+        return ResponseEntity.ok().build();
+    }
 
     @PostMapping("logout")
     public ResponseEntity<Void> logout(@PathVariable String domainName, @RequestBody RefreshTokenRequest refreshTokenRequest,

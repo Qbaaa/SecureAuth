@@ -2,7 +2,6 @@ package com.qbaaa.secure.auth.repository;
 
 import com.qbaaa.secure.auth.entity.DomainEntity;
 import com.qbaaa.secure.auth.projection.DomainConfigValidityProjection;
-import com.qbaaa.secure.auth.projection.UserProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -19,4 +18,7 @@ public interface DomainRepository extends JpaRepository<DomainEntity, Long> {
                 where d.name = :domainName
                 """)
     Optional<DomainConfigValidityProjection> findConfigValidityByName(String domainName);
+
+    Optional<DomainEntity> findByName(String name);
+
 }

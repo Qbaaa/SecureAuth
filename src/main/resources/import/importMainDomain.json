@@ -14,8 +14,7 @@
     {
       "username": "admin",
       "email": "admin@test.com",
-      "isActive": 1,
-      "isVerified": 1,
+      "isActive": true,
       "password": {
         "password": "admin"
       },

@@ -4,10 +4,10 @@ VALUES (100, 'test-domain', 300, 600, 180, 3600,
         '2025-03-25 22:15:00', '2025-03-25 22:15:00')
 ;
 
-INSERT INTO secureauth."user" (id, domain_id, username, email, is_active, is_verified, created_at, updated_at)
-VALUES (101, 100, 'user001', 'user001@test.com', true, true,
+INSERT INTO secureauth."user" (id, domain_id, username, email, is_active, created_at, updated_at)
+VALUES (101, 100, 'user001', 'user001@test.com', true,
         '2025-03-25 22:30:00', '2025-03-25 22:30:00')
-     , (102, 100, 'user002', 'user002@test.com', true, true,
+     , (102, 100, 'user002', 'user002@test.com', true,
         '2025-03-25 22:35:00', '2025-03-25 22:35:00');
 ;
 

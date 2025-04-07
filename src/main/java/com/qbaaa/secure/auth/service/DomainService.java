@@ -1,5 +1,7 @@
 package com.qbaaa.secure.auth.service;
 
+import com.qbaaa.secure.auth.entity.DomainEntity;
+import com.qbaaa.secure.auth.projection.DomainConfigRegisterProjection;
 import com.qbaaa.secure.auth.projection.DomainConfigValidityProjection;
 import com.qbaaa.secure.auth.repository.DomainRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,4 +19,10 @@ public class DomainService {
         return domainRepository.findConfigValidityByName(domainName).orElseThrow(() ->
                 new EntityNotFoundException(domainName));
     }
+
+    public DomainEntity getDomain(String domainName) {
+        return domainRepository.findByName(domainName)
+                .orElseThrow(() -> new EntityNotFoundException(domainName));
+    }
+
 }

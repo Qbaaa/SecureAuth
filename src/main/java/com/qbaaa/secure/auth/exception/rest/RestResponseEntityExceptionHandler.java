@@ -1,10 +1,13 @@
 package com.qbaaa.secure.auth.exception.rest;
 
 import com.qbaaa.secure.auth.exception.DomainExistsException;
+import com.qbaaa.secure.auth.exception.EmailAlreadyExistsException;
 import com.qbaaa.secure.auth.exception.InputInvalidException;
 import com.qbaaa.secure.auth.exception.LoginException;
+import com.qbaaa.secure.auth.exception.RegisterException;
 import com.qbaaa.secure.auth.exception.RestErrorCodeType;
 import com.qbaaa.secure.auth.exception.UnSupportedFileException;
+import com.qbaaa.secure.auth.exception.UsernameAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +28,14 @@ import java.util.UUID;
 public class RestResponseEntityExceptionHandler {
 
     private static final String SERVER_ERROR_LOG = "SERVER ERROR, uuid: {}, uri: {}";
+
+    @ExceptionHandler(RegisterException.class)
+    ResponseEntity<ErrorDetails> handleRegisterException(RegisterException ex, HttpServletRequest request) {
+        var errorCodeType = RestErrorCodeType.REGISTER_DISABLED_DOMAIN;
+        var errorDetails = buildErrorDetails(errorCodeType.getErrorType(), ex.getMessage());
+        log.error(SERVER_ERROR_LOG, errorDetails.uuid(), request.getRequestURI(), ex);
+        return ResponseEntity.status(errorCodeType.getHttpStatus()).body(errorDetails);
+    }
 
     @ExceptionHandler(BadCredentialsException.class)
     ResponseEntity<ErrorDetails> handleBadCredentialsException(BadCredentialsException ex, HttpServletRequest request) {
@@ -94,6 +105,22 @@ public class RestResponseEntityExceptionHandler {
                         });
 
         var errorDetails = buildErrorDetails(errorCodeType.getErrorType(), errors.toString());
+        log.error(SERVER_ERROR_LOG, errorDetails.uuid(), request.getRequestURI(), ex);
+        return ResponseEntity.status(errorCodeType.getHttpStatus()).body(errorDetails);
+    }
+
+    @ExceptionHandler(UsernameAlreadyExistsException.class)
+    ResponseEntity<ErrorDetails> handleUsernameExistsException(UsernameAlreadyExistsException ex, HttpServletRequest request) {
+        var errorCodeType = RestErrorCodeType.USERNAME_ALREADY_EXISTS;
+        var errorDetails = buildErrorDetails(errorCodeType.getErrorType(), ex.getMessage());
+        log.error(SERVER_ERROR_LOG, errorDetails.uuid(), request.getRequestURI(), ex);
+        return ResponseEntity.status(errorCodeType.getHttpStatus()).body(errorDetails);
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    ResponseEntity<ErrorDetails> handleEmailExistsException(EmailAlreadyExistsException ex, HttpServletRequest request) {
+        var errorCodeType = RestErrorCodeType.EMAIL_ALREADY_EXISTS;
+        var errorDetails = buildErrorDetails(errorCodeType.getErrorType(), ex.getMessage());
         log.error(SERVER_ERROR_LOG, errorDetails.uuid(), request.getRequestURI(), ex);
         return ResponseEntity.status(errorCodeType.getHttpStatus()).body(errorDetails);
     }

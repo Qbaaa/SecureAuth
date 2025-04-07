@@ -35,5 +35,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
                 """)
     Optional<UserEntity> findBySessions(UUID sessionToken);
 
+    boolean existsByDomainNameAndUsername(String name, String username);
+
+    boolean existsByDomainNameAndEmail(String name, String email);
 
 }

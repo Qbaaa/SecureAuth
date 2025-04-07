@@ -45,8 +45,6 @@ public class UserEntity extends AuditDataEntity {
 
     private Boolean isActive;
 
-    private Boolean isVerified;
-
     @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
     private PasswordEntity password;
 
@@ -66,15 +64,15 @@ public class UserEntity extends AuditDataEntity {
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name = "user_role",
-            joinColumns = @JoinColumn(name = "role_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private List<RoleEntity> roles;
 
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof UserEntity that)) return false;
-        return isActive == that.isActive && isVerified == that.isVerified && Objects.equals(id, that.id) &&
+        return isActive == that.isActive && Objects.equals(id, that.id) &&
                 Objects.equals(username, that.username) && Objects.equals(email, that.email) &&
                 Objects.equals(password, that.password) && Objects.equals(refreshToken, that.refreshToken) &&
                 Objects.equals(emailVerificationToken, that.emailVerificationToken) && Objects.equals(domain, that.domain) &&
@@ -83,7 +81,7 @@ public class UserEntity extends AuditDataEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, username, email, isActive, isVerified, password, refreshToken, emailVerificationToken, domain, sessions, roles);
+        return Objects.hash(id, username, email, isActive, password, refreshToken, emailVerificationToken, domain, sessions, roles);
     }
 
     @Override
@@ -93,7 +91,6 @@ public class UserEntity extends AuditDataEntity {
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", isActive=" + isActive +
-                ", isVerified=" + isVerified +
                 ", password=" + password +
                 '}';
     }

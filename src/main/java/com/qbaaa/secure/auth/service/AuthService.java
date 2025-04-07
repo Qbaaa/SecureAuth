@@ -2,6 +2,10 @@ package com.qbaaa.secure.auth.service;
 
 import com.qbaaa.secure.auth.config.security.jwt.JwtService;
 import com.qbaaa.secure.auth.dto.RefreshTokenRequest;
+import com.qbaaa.secure.auth.dto.RegisterRequest;
+import com.qbaaa.secure.auth.exception.EmailAlreadyExistsException;
+import com.qbaaa.secure.auth.exception.UsernameAlreadyExistsException;
+import com.qbaaa.secure.auth.exception.RegisterException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
@@ -18,6 +22,19 @@ public class AuthService {
     private final JwtService jwtService;
     private final SessionServer sessionServer;
     private final RefreshTokenService refreshTokenService;
+    private final DomainService domainService;
+    private final UserService userService;
+
+    @Transactional
+    public void register(String domainName, RegisterRequest registerRequest) {
+
+        var domain = domainService.getDomain(domainName);
+        if (Boolean.FALSE.equals(domain.getIsEnabledRegister())) {
+            throw new RegisterException("Registration is disabled for this domain");
+        }
+
+        userService.register(domain, registerRequest);
+    }
 
     @Transactional
     public void logout(String domainName, String baseUrl, RefreshTokenRequest refreshTokenRequest) {

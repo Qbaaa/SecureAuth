@@ -107,8 +107,15 @@ class ImportDomainTestIT {
                     () -> Assertions.assertEquals(2, roleRepositoryTest.countByDomainName(addingDomain)),
                     () -> Assertions.assertEquals(2, userRepositoryTest.countByDomainName(addingDomain)),
                     () -> {
+                        var addingUser = userRepositoryTest.findByDomainNameAndUsername(addingDomain, "admin");
+                        Assertions.assertTrue(addingUser.isPresent());
+                        Assertions.assertTrue(addingUser.get().getIsActive());
+                        Assertions.assertEquals(1, addingUser.get().getRoles().size());
+                    },
+                    () -> {
                         var addingUser = userRepositoryTest.findByDomainNameAndUsername(addingDomain, "user001");
                         Assertions.assertTrue(addingUser.isPresent());
+                        Assertions.assertFalse(addingUser.get().getIsActive());
                         Assertions.assertEquals(1, addingUser.get().getRoles().size());
                     }
             );

@@ -11,15 +11,15 @@
     },
     {
       "name": "USER",
-      "description": "Role default User"
+      "description": "Role default User",
+      "isDefault": true
     }
   ],
   "users": [
     {
       "username": "admin",
       "email": "admin@test.com",
-      "isActive": 1,
-      "isVerified": 1,
+      "isActive": true,
       "password": {
         "password": "admin"
       },
@@ -32,8 +32,6 @@
     {
       "username": "user001",
       "email": "user001@test.com",
-      "isActive": 1,
-      "isVerified": 1,
       "password": {
         "password": "userPassword"
       },

@@ -37,6 +37,8 @@ public class RoleEntity extends AuditDataEntity {
 
     private String description;
 
+    private Boolean isDefault = Boolean.FALSE;
+
     @ManyToOne
     @JoinColumn(name = "domain_id", nullable = false)
     private DomainEntity domain;

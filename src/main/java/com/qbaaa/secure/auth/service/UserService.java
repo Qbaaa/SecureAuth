@@ -1,12 +1,16 @@
 package com.qbaaa.secure.auth.service;
 
+import com.qbaaa.secure.auth.dto.PasswordTransferDto;
+import com.qbaaa.secure.auth.dto.RegisterRequest;
 import com.qbaaa.secure.auth.dto.RoleTransferDto;
 import com.qbaaa.secure.auth.dto.UserTransferDto;
 import com.qbaaa.secure.auth.entity.DomainEntity;
 import com.qbaaa.secure.auth.entity.RoleEntity;
 import com.qbaaa.secure.auth.entity.UserEntity;
+import com.qbaaa.secure.auth.exception.EmailAlreadyExistsException;
 import com.qbaaa.secure.auth.exception.UserAlreadyExistsException;
-import com.qbaaa.secure.auth.mapper.UserImportMapper;
+import com.qbaaa.secure.auth.exception.UsernameAlreadyExistsException;
+import com.qbaaa.secure.auth.mapper.UserMapper;
 import com.qbaaa.secure.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,9 +25,10 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordService passwordService;
-    private final UserImportMapper userImportMapper;
+    private final RoleService roleService;
+    private final UserMapper userMapper;
 
-    public void assignUsersToDomain(DomainEntity domain, List<UserTransferDto> usersImport, List<RoleEntity> rolesDomain) {
+    public void  assignUsersToDomain(DomainEntity domain, List<UserTransferDto> usersImport, List<RoleEntity> rolesDomain) {
 
         usersImport.forEach(userImport -> {
             var userImportRoles = userImport.roles().stream().map(RoleTransferDto::name).toList();
@@ -33,7 +38,7 @@ public class UserService {
             if (userRepository.existsUserInDomain(domain.getName(), userImport.username(), userImport.email())) {
                 throw new UserAlreadyExistsException(userImport.username(), userImport.email(), domain.getName());
             }
-            var userEntity = userRepository.save(userImportMapper.mapUserEntity(userImport, domain, assignRolesToUser));
+            var userEntity = userRepository.save(userMapper.mapUserEntity(userImport, domain, assignRolesToUser));
 
             passwordService.saveToUser(userEntity, userImport.password());
         });
@@ -46,6 +51,22 @@ public class UserService {
 
     public Optional<UserEntity> findUserBySession(UUID sessionToken) {
         return userRepository.findBySessions(sessionToken);
+    }
+
+    public void register(DomainEntity domain, RegisterRequest registerRequest) {
+        if (Boolean.TRUE.equals(userRepository.existsByDomainNameAndUsername(domain.getName(), registerRequest.username()))) {
+            throw new UsernameAlreadyExistsException("Username is already in use. Please choose a different one.");
+        }
+
+        if (Boolean.TRUE.equals(userRepository.existsByDomainNameAndEmail(domain.getName(), registerRequest.email()))) {
+            throw new EmailAlreadyExistsException("Email is already in use. Please choose a different one.");
+        }
+
+        var assignRolesToUser = roleService.getRolesToRegisterUser(domain.getName());
+        var userEntity = userRepository.save(userMapper.mapUserEntity(registerRequest, domain, assignRolesToUser));
+
+        var passwordTransfer = new PasswordTransferDto(registerRequest.password());
+        passwordService.saveToUser(userEntity, passwordTransfer);
     }
 
 }

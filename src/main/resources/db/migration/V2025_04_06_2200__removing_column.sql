@@ -1,0 +1,1 @@
+ALTER TABLE secureauth."user" DROP COLUMN is_verified;
