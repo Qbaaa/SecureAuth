@@ -8,6 +8,7 @@ import com.qbaaa.secure.auth.service.AuthService;
 import com.qbaaa.secure.auth.service.strategy.AuthStrategy;
 import com.qbaaa.secure.auth.util.UrlUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +39,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@PathVariable String domainName, @RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<Void> register(@PathVariable String domainName, @RequestBody @Valid RegisterRequest registerRequest) {
         authService.register(domainName, registerRequest);
         return ResponseEntity.ok().build();
     }
