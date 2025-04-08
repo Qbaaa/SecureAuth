@@ -8,13 +8,12 @@ import lombok.Getter;
 @EqualsAndHashCode(callSuper = true)
 public class LoginRequest extends AuthRequest {
 
-    private final String username;
-    private final String password;
+  private final String username;
+  private final String password;
 
-    public LoginRequest(String username, String password) {
-        super(AuthType.PASSWORD);
-        this.username = username;
-        this.password = password;
-    }
-
+  public LoginRequest(String username, String password) {
+    super(AuthType.PASSWORD);
+    this.username = username;
+    this.password = password;
+  }
 }

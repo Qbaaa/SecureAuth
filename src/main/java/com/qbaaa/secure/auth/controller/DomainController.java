@@ -21,17 +21,19 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "Domain API")
 public class DomainController {
 
-    private final DomainImportService domainImportService;
-    private final FileUploadValidator fileUploadValidator;
+  private final DomainImportService domainImportService;
+  private final FileUploadValidator fileUploadValidator;
 
-    @Operation(summary = "Imports a domain based on the uploaded file", security = @SecurityRequirement(name = "Authorization"))
-    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<Void> importDomain(@RequestPart(value = "file") MultipartFile fileUpload) {
+  @Operation(
+      summary = "Imports a domain based on the uploaded file",
+      security = @SecurityRequirement(name = "Authorization"))
+  @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  public ResponseEntity<Void> importDomain(@RequestPart(value = "file") MultipartFile fileUpload) {
 
-        if (!fileUploadValidator.validate(fileUpload)) {
-            throw new DomainImportException("Validation error");
-        }
-        domainImportService.importFileDomain(fileUpload);
-        return ResponseEntity.ok().build();
+    if (!fileUploadValidator.validate(fileUpload)) {
+      throw new DomainImportException("Validation error");
     }
+    domainImportService.importFileDomain(fileUpload);
+    return ResponseEntity.ok().build();
+  }
 }

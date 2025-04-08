@@ -1,7 +1,6 @@
 package com.qbaaa.secure.auth.service;
 
 import com.qbaaa.secure.auth.entity.DomainEntity;
-import com.qbaaa.secure.auth.projection.DomainConfigRegisterProjection;
 import com.qbaaa.secure.auth.projection.DomainConfigValidityProjection;
 import com.qbaaa.secure.auth.repository.DomainRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -12,17 +11,18 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DomainService {
 
-    private final DomainRepository domainRepository;
+  private final DomainRepository domainRepository;
 
-    public DomainConfigValidityProjection getDomainConfigValidity(String domainName) {
+  public DomainConfigValidityProjection getDomainConfigValidity(String domainName) {
 
-        return domainRepository.findConfigValidityByName(domainName).orElseThrow(() ->
-                new EntityNotFoundException(domainName));
-    }
+    return domainRepository
+        .findConfigValidityByName(domainName)
+        .orElseThrow(() -> new EntityNotFoundException(domainName));
+  }
 
-    public DomainEntity getDomain(String domainName) {
-        return domainRepository.findByName(domainName)
-                .orElseThrow(() -> new EntityNotFoundException(domainName));
-    }
-
+  public DomainEntity getDomain(String domainName) {
+    return domainRepository
+        .findByName(domainName)
+        .orElseThrow(() -> new EntityNotFoundException(domainName));
+  }
 }

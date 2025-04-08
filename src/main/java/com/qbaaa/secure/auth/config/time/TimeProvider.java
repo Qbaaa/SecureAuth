@@ -5,8 +5,7 @@ import java.time.LocalDateTime;
 
 public interface TimeProvider {
 
-    Instant getTimestamp();
+  Instant getTimestamp();
 
-    LocalDateTime getLocalDateTimeNow();
-
+  LocalDateTime getLocalDateTimeNow();
 }

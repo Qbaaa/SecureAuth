@@ -9,14 +9,12 @@ import lombok.RequiredArgsConstructor;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = LoginRequest.class, name = "password"),
-        @JsonSubTypes.Type(value = RefreshTokenRequest.class, name = "refresh-token")
+  @JsonSubTypes.Type(value = LoginRequest.class, name = "password"),
+  @JsonSubTypes.Type(value = RefreshTokenRequest.class, name = "refresh-token")
 })
 @Getter
 @RequiredArgsConstructor
 public abstract class AuthRequest {
 
-    @NotNull
-    private final AuthType type;
-
+  @NotNull private final AuthType type;
 }

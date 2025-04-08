@@ -8,11 +8,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "session", schema = "secureauth")
@@ -20,22 +19,21 @@ import java.util.UUID;
 @Setter
 public class SessionEntity extends AuditDataEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable = false)
-    private UUID sessionToken;
+  @Column(nullable = false)
+  private UUID sessionToken;
 
-    private String ipAddress;
+  private String ipAddress;
 
-    private String userAgent;
+  private String userAgent;
 
-    @Column(nullable = false)
-    private LocalDateTime expiresAt;
+  @Column(nullable = false)
+  private LocalDateTime expiresAt;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
-
+  @ManyToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  private UserEntity user;
 }

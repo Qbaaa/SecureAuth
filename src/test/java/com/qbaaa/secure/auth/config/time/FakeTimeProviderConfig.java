@@ -7,9 +7,9 @@ import org.springframework.context.annotation.Primary;
 @TestConfiguration
 public class FakeTimeProviderConfig {
 
-    @Bean
-    @Primary
-    public FakeTimeProvider fakeTimeProvider() {
-        return new FakeTimeProvider();
-    }
+  @Bean
+  @Primary
+  public FakeTimeProvider fakeTimeProvider() {
+    return new FakeTimeProvider();
+  }
 }

@@ -6,10 +6,11 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface SessionRepositoryTest extends JpaRepository<SessionEntity, Long> {
 
-    @Query("""
+  @Query(
+      """
                 select count(s)
                 from SessionEntity s
                 where s.user.username = :username
                 """)
-    long countByUsername(String username);
+  long countByUsername(String username);
 }

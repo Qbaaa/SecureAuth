@@ -8,20 +8,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface RefreshTokenRepository extends JpaRepository<RefreshTokenEntity, Long> {
 
-    @Transactional
-    @Modifying
-    @Query("""
+  @Transactional
+  @Modifying
+  @Query(
+      """
                 delete
                 from RefreshTokenEntity r
                 where r.token = :token
                 """)
-    int deleteByToken(String token);
+  int deleteByToken(String token);
 
-    @Query("""
+  @Query(
+      """
                 select (count(r) > 0)
                 from RefreshTokenEntity r
                 where r.token = :token
                 """)
-    boolean existsRefreshToken(String token);
-
+  boolean existsRefreshToken(String token);
 }

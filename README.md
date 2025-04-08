@@ -24,3 +24,15 @@ mvn clean spring-boot:test-run -Dspring-boot.run.profiles=test
 ```sh
 mvn clean spring-boot:run
 ```
+
+
+## Spotless
+## Checking if the code is formatted
+```sh
+mvn spotless:check
+```
+
+## Automatic formatting:
+```sh
+mvn spotless:apply
+```

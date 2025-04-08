@@ -7,5 +7,6 @@ import org.springframework.stereotype.Component;
 @Component
 public abstract class AuthStrategy {
 
-    public abstract TokenResponse authenticate(String domainName, String baseUrl, AuthRequest request);
+  public abstract TokenResponse authenticate(
+      String domainName, String baseUrl, AuthRequest request);
 }

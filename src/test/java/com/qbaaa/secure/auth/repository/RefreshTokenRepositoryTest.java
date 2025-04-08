@@ -6,13 +6,13 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface RefreshTokenRepositoryTest extends JpaRepository<RefreshTokenEntity, Long> {
 
-    @Query("""
+  @Query(
+      """
                 select count(r)
                 from RefreshTokenEntity r
                 where r.user.username = :username
                 """)
-    long countByUsername(String username);
+  long countByUsername(String username);
 
-    boolean existsByToken(String token);
-
+  boolean existsByToken(String token);
 }

@@ -8,10 +8,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "refresh_token", schema = "secureauth")
@@ -19,20 +18,19 @@ import java.time.LocalDateTime;
 @Setter
 public class RefreshTokenEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable = false)
-    private String token;
+  @Column(nullable = false)
+  private String token;
 
-    private LocalDateTime createdAt;
+  private LocalDateTime createdAt;
 
-    @Column(nullable = false)
-    private LocalDateTime expiresAt;
+  @Column(nullable = false)
+  private LocalDateTime expiresAt;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
-
+  @OneToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  private UserEntity user;
 }

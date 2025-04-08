@@ -6,11 +6,11 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface RoleRepositoryTest extends JpaRepository<RoleEntity, Long> {
 
-    @Query("""
+  @Query(
+      """
                 select count(r)
                 from RoleEntity r
                 where r.domain.name = :domainName
                 """)
-    long countByDomainName(String domainName);
-
+  long countByDomainName(String domainName);
 }

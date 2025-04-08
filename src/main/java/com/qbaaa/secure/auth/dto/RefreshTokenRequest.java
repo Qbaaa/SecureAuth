@@ -8,10 +8,10 @@ import lombok.Getter;
 @EqualsAndHashCode(callSuper = true)
 public class RefreshTokenRequest extends AuthRequest {
 
-    String token;
+  String token;
 
-    public RefreshTokenRequest(String token) {
-        super(AuthType.REFRESH_TOKEN);
-        this.token = token;
-    }
+  public RefreshTokenRequest(String token) {
+    super(AuthType.REFRESH_TOKEN);
+    this.token = token;
+  }
 }

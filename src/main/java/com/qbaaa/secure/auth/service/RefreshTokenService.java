@@ -13,28 +13,28 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final TimeProvider timeProvider;
+  private final RefreshTokenRepository refreshTokenRepository;
+  private final TimeProvider timeProvider;
 
-    public void createRefreshToken(UserEntity user, Integer refreshTokenValidity, String token) {
-        var dateTime = timeProvider.getLocalDateTimeNow();
-        var refreshToken = new RefreshTokenEntity();
-        refreshToken.setToken(token);
-        refreshToken.setUser(user);
-        refreshToken.setCreatedAt(dateTime);
-        refreshToken.setExpiresAt(dateTime.plusSeconds(refreshTokenValidity));
-        refreshTokenRepository.save(refreshToken);
-    }
+  public void createRefreshToken(UserEntity user, Integer refreshTokenValidity, String token) {
+    var dateTime = timeProvider.getLocalDateTimeNow();
+    var refreshToken = new RefreshTokenEntity();
+    refreshToken.setToken(token);
+    refreshToken.setUser(user);
+    refreshToken.setCreatedAt(dateTime);
+    refreshToken.setExpiresAt(dateTime.plusSeconds(refreshTokenValidity));
+    refreshTokenRepository.save(refreshToken);
+  }
 
-    public void deleteRefreshToken(String token) {
-        var deleteToken = refreshTokenRepository.deleteByToken(token);
-        if (deleteToken < 0) {
-            log.warn("Failed to delete refresh token");
-        }
-        log.info("Successfully deleted refresh token, number of deleted: {}", deleteToken);
+  public void deleteRefreshToken(String token) {
+    var deleteToken = refreshTokenRepository.deleteByToken(token);
+    if (deleteToken < 0) {
+      log.warn("Failed to delete refresh token");
     }
+    log.info("Successfully deleted refresh token, number of deleted: {}", deleteToken);
+  }
 
-    public boolean existsRefreshToken(String token) {
-        return refreshTokenRepository.existsRefreshToken(token);
-    }
+  public boolean existsRefreshToken(String token) {
+    return refreshTokenRepository.existsRefreshToken(token);
+  }
 }

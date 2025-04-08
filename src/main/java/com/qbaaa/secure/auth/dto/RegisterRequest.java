@@ -6,18 +6,12 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record RegisterRequest(
-        @NotBlank(message = "Username is required")
+    @NotBlank(message = "Username is required")
         @Size(min = 4, max = 50)
-        @Pattern(regexp = "^[A-Za-z0-9_.-]+$",
-                message = "Username contains forbidden characters")
+        @Pattern(regexp = "^[A-Za-z0-9_.-]+$", message = "Username contains forbidden characters")
         String username,
-        @NotBlank(message = "Email is required")
+    @NotBlank(message = "Email is required")
         @Email
-        @Pattern(regexp = "^[A-Za-z0-9@_.-]+$",
-                message = "Email contains forbidden characters")
+        @Pattern(regexp = "^[A-Za-z0-9@_.-]+$", message = "Email contains forbidden characters")
         String email,
-        @NotBlank(message = "Password is required")
-        @Size(min = 6)
-        String password
-) {
-}
+    @NotBlank(message = "Password is required") @Size(min = 6) String password) {}
