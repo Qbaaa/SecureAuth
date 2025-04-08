@@ -69,7 +69,9 @@ public class UserEntity extends AuditDataEntity {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof UserEntity that)) return false;
+    if (!(o instanceof UserEntity that)) {
+      return false;
+    }
     return isActive == that.isActive
         && Objects.equals(id, that.id)
         && Objects.equals(username, that.username)

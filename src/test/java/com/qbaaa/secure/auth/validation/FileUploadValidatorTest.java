@@ -50,7 +50,7 @@ class FileUploadValidatorTest {
   }
 
   @Test
-  void shouldThrowExceptionWhenFileIsNotJSON() {
+  void shouldThrowExceptionWhenFileIsNotJson() {
 
     try {
       // given

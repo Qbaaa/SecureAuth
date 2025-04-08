@@ -23,6 +23,8 @@
 		<jacoco.version>0.8.13</jacoco.version>
 		<maven.spotless.version>2.44.4</maven.spotless.version>
 		<java.format.version>1.26.0</java.format.version>
+        <maven.checkstyle.version>3.6.0</maven.checkstyle.version>
+        <checkstyle.version>10.23.0</checkstyle.version>
 	</properties>
 	<dependencies>
 
@@ -276,6 +278,50 @@
 				</executions>
 
 			</plugin>
+
+            <plugin>
+
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven.checkstyle.version}</version>
+
+                <dependencies>
+
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>${checkstyle.version}</version>
+                    </dependency>
+
+                </dependencies>
+
+                <configuration>
+
+                    <configLocation>checkstyle/checks.xml</configLocation>
+                    <inputEncoding>UTF-8</inputEncoding>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <failOnViolation>true</failOnViolation>
+                    <failOnViolation>true</failOnViolation>
+                    <violationSeverity>warning</violationSeverity>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+
+                    </execution>
+
+                </executions>
+
+            </plugin>
 
 		</plugins>
 

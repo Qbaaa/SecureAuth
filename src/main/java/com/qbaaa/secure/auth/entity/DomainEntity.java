@@ -51,7 +51,9 @@ public class DomainEntity extends AuditDataEntity {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof DomainEntity that)) return false;
+    if (!(o instanceof DomainEntity that)) {
+      return false;
+    }
     return Objects.equals(id, that.id)
         && Objects.equals(name, that.name)
         && Objects.equals(accessTokenValidity, that.accessTokenValidity)

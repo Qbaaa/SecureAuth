@@ -51,7 +51,9 @@ public class RoleEntity extends AuditDataEntity {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof RoleEntity that)) return false;
+    if (!(o instanceof RoleEntity that)) {
+      return false;
+    }
     return Objects.equals(id, that.id)
         && Objects.equals(name, that.name)
         && Objects.equals(description, that.description)

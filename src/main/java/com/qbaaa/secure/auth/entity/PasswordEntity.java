@@ -31,7 +31,9 @@ public class PasswordEntity extends AuditDataEntity {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof PasswordEntity that)) return false;
+    if (!(o instanceof PasswordEntity that)) {
+      return false;
+    }
     return Objects.equals(id, that.id)
         && Objects.equals(password, that.password)
         && Objects.equals(user, that.user);

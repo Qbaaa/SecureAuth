@@ -43,7 +43,9 @@ public class KeyEntity extends AuditDataEntity {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof KeyEntity keyEntity)) return false;
+    if (!(o instanceof KeyEntity keyEntity)) {
+      return false;
+    }
     return Objects.equals(id, keyEntity.id)
         && Objects.equals(algorithm, keyEntity.algorithm)
         && Objects.equals(publicKey, keyEntity.publicKey)
