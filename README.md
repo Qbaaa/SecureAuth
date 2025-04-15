@@ -9,6 +9,10 @@
 ## Swagger
 http://localhost:8080/swagger-ui/index.html
 
+## Mail
+[Mailhog UI]
+http://localhost:8125
+
 ## Run Test Cases Command
 [Infrastructure is build in docker by TestContainers Automatically]
 ```sh

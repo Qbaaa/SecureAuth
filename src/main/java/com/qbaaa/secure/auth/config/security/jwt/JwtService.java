@@ -57,6 +57,18 @@ public class JwtService {
         .sign(algorithm);
   }
 
+  public String createActiveAccountToken(
+      String baseUrl, String domainName, Integer emailTokenValidity) {
+    var privateKey = keyService.getPrivateKey(domainName);
+    var algorithm = Algorithm.RSA256(null, privateKey);
+    var timestamp = timeProvider.getTimestamp();
+
+    return JWT.create()
+        .withIssuer(baseUrl + PREFIX_ISSUER + domainName)
+        .withExpiresAt(timestamp.plusSeconds(emailTokenValidity))
+        .sign(algorithm);
+  }
+
   public Optional<DecodedJWT> verify(String issuer, String token) {
     try {
       var domainName = issuer.substring(issuer.lastIndexOf('/') + 1);

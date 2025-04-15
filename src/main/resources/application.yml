@@ -22,6 +22,7 @@ spring:
     out-of-order: true
     schemas: secureauth
     locations: classpath:db/migration
+
   application:
     name: auth
 
@@ -41,6 +42,11 @@ spring:
         show_sql: true
     show-sql: true
 
+  mail:
+    host: localhost
+    port: 1125
+
+
   docker:
     compose:
       enabled: false
@@ -52,3 +58,7 @@ secureauth:
     user: ${SECUREAUTH_ADMIN_USER:}
     email: ${SECUREAUTH_ADMIN_EMAIL:}
     password: ${SECUREAUTH_ADMIN_PASSWORD:}
+  mail:
+    notificationEmail: notification@test.com
+    activeAccountTemplate: active-email.ftl
+    activationPath: /domains/%s/auth/account/activate?token=%s

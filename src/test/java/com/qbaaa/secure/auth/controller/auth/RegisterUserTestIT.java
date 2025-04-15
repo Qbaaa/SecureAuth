@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qbaaa.secure.auth.config.ContainerConfiguration;
 import com.qbaaa.secure.auth.dto.RegisterRequest;
+import com.qbaaa.secure.auth.repository.EmailTokenRepository;
 import com.qbaaa.secure.auth.repository.UserRepositoryTest;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -37,6 +38,8 @@ class RegisterUserTestIT {
 
   @Autowired private UserRepositoryTest userRepositoryTest;
 
+  @Autowired private EmailTokenRepository emailTokenRepository;
+
   @BeforeAll
   static void beforeAll(TestInfo testInfo) {
     log.info("--------------------------------------------------");
@@ -49,7 +52,7 @@ class RegisterUserTestIT {
   @Test
   @Sql(scripts = "classpath:test/db/clean_all_data.sql")
   @Sql(scripts = "classpath:test/db/data/auth/post_register.sql")
-  void shouldRegisterUser() {
+  void shouldRegisterUserWhenVerifiedEmailIsDisabled() {
     try {
       // given
       final var domainName = "test-domain";
@@ -58,7 +61,8 @@ class RegisterUserTestIT {
 
       assertAll(
           "CHECK TABLES DATA BEFORE REGISTER",
-          () -> Assertions.assertEquals(1, userRepositoryTest.countByDomainName(domainName)));
+          () -> Assertions.assertEquals(1, userRepositoryTest.countByDomainName(domainName)),
+          () -> Assertions.assertEquals(0, emailTokenRepository.count()));
 
       // when
       mockMvc
@@ -77,12 +81,64 @@ class RegisterUserTestIT {
                     () ->
                         Assertions.assertEquals(
                             2, userRepositoryTest.countByDomainName(domainName)),
+                    () -> Assertions.assertEquals(0, emailTokenRepository.count()),
                     () -> {
                       var addingUser =
                           userRepositoryTest.findByDomainNameAndUsername(domainName, username);
                       Assertions.assertTrue(addingUser.isPresent());
                       Assertions.assertTrue(addingUser.get().getIsActive());
                       Assertions.assertEquals(2, addingUser.get().getRoles().size());
+                      Assertions.assertNotNull(addingUser.get().getPassword());
+                    });
+              });
+
+    } catch (Exception e) {
+      Assertions.fail("ERROR: " + e.getMessage());
+    }
+  }
+
+  @Test
+  @Sql(scripts = "classpath:test/db/clean_all_data.sql")
+  @Sql(scripts = "classpath:test/db/data/auth/post_register.sql")
+  void shouldRegisterUserWhenVerifiedEmailIsEnabled() {
+    try {
+      // given
+      final var domainName = "test-domain-002";
+      var username = "newUser001";
+      var registerRequest = new RegisterRequest(username, "newUser@test.com", "secret001");
+
+      assertAll(
+          "CHECK TABLES DATA BEFORE REGISTER",
+          () -> Assertions.assertEquals(0, userRepositoryTest.countByDomainName(domainName)),
+          () -> Assertions.assertEquals(0, emailTokenRepository.count()));
+
+      // when
+      mockMvc
+          .perform(
+              MockMvcRequestBuilders.post(API_POST_REGISTER, domainName)
+                  .content(objectMapper.writeValueAsString(registerRequest))
+                  .contentType(MediaType.APPLICATION_JSON_VALUE))
+
+          // then
+          .andExpect(
+              result -> {
+                Assertions.assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
+                Assertions.assertEquals(
+                    "Sent email with link activate account",
+                    result.getResponse().getContentAsString());
+
+                assertAll(
+                    "CHECK TABLES DATA AFTER REGISTER",
+                    () ->
+                        Assertions.assertEquals(
+                            1, userRepositoryTest.countByDomainName(domainName)),
+                    () -> Assertions.assertEquals(1, emailTokenRepository.count()),
+                    () -> {
+                      var addingUser =
+                          userRepositoryTest.findByDomainNameAndUsername(domainName, username);
+                      Assertions.assertTrue(addingUser.isPresent());
+                      Assertions.assertFalse(addingUser.get().getIsActive());
+                      Assertions.assertEquals(1, addingUser.get().getRoles().size());
                       Assertions.assertNotNull(addingUser.get().getPassword());
                     });
               });

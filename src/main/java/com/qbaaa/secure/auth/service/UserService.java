@@ -57,7 +57,7 @@ public class UserService {
     return userRepository.findBySessions(sessionToken);
   }
 
-  public void register(DomainEntity domain, RegisterRequest registerRequest) {
+  public UserEntity register(DomainEntity domain, RegisterRequest registerRequest) {
     if (Boolean.TRUE.equals(
         userRepository.existsByDomainNameAndUsername(
             domain.getName(), registerRequest.username()))) {
@@ -77,5 +77,7 @@ public class UserService {
 
     var passwordTransfer = new PasswordTransferDto(registerRequest.password());
     passwordService.saveToUser(userEntity, passwordTransfer);
+
+    return userEntity;
   }
 }

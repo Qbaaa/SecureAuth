@@ -1,6 +1,6 @@
 @domainName = master
 ##########################
-POST http://localhost:8080/auth/domains/{{domainName}}/token
+POST http://localhost:8080/domains/{{domainName}}/auth/token
 Accept: application/json
 Content-Type: application/json
 
@@ -16,7 +16,7 @@ Content-Type: application/json
 %}
 
 ##########################
-POST http://localhost:8080/auth/domains/{{domainName}}/token
+POST http://localhost:8080/domains/{{domainName}}/auth/token
 Accept: application/json
 Content-Type: application/json
 
@@ -41,5 +41,16 @@ Content-Type: application/json
 
 < D:/jakub/Desktop/PredictStock/secureauth/src/test/resources/upload/importDomainTest.json
 --boundary123--
+
+##########################
+POST http://localhost:8080/domains/{{domainName}}/auth/register
+Accept: application/json
+Content-Type: application/json
+
+{
+  "username": "test7432",
+  "email": "test743@gmail.com",
+  "password": "sectret123"
+}
 
 
