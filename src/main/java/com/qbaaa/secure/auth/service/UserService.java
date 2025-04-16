@@ -12,6 +12,7 @@ import com.qbaaa.secure.auth.exception.UserAlreadyExistsException;
 import com.qbaaa.secure.auth.exception.UsernameAlreadyExistsException;
 import com.qbaaa.secure.auth.mapper.UserMapper;
 import com.qbaaa.secure.auth.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -79,5 +80,15 @@ public class UserService {
     passwordService.saveToUser(userEntity, passwordTransfer);
 
     return userEntity;
+  }
+
+  public void activeAccount(String domainName, String username) {
+    var user =
+        userRepository
+            .findUserInDomain(domainName, username)
+            .orElseThrow(() -> new EntityNotFoundException("User not found in domain"));
+
+    user.setIsActive(Boolean.TRUE);
+    userRepository.save(user);
   }
 }

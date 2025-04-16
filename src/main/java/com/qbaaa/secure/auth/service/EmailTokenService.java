@@ -5,8 +5,10 @@ import com.qbaaa.secure.auth.entity.EmailVerificationTokenEntity;
 import com.qbaaa.secure.auth.entity.UserEntity;
 import com.qbaaa.secure.auth.repository.EmailTokenRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailTokenService {
@@ -22,5 +24,17 @@ public class EmailTokenService {
     emailToken.setCreatedAt(dateTime);
     emailToken.setExpiresAt(dateTime.plusSeconds(emailTokenValidity));
     emailTokenRepository.save(emailToken);
+  }
+
+  public boolean existsEmailToken(String token) {
+    return emailTokenRepository.existsByToken(token);
+  }
+
+  public void deleteEmailToken(String token) {
+    var emailToken = emailTokenRepository.deleteByToken(token);
+    if (emailToken < 0) {
+      log.warn("Failed to delete email token");
+    }
+    log.info("Successfully deleted email token, number of deleted: {}", emailToken);
   }
 }

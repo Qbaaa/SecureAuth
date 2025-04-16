@@ -21,7 +21,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
       """
                 select u
                 from UserEntity u
-                join fetch u.roles r
+                left join fetch u.roles r
                 where u.domain.name = :domainName
                 and u.username = :username
                 """)

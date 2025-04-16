@@ -8,6 +8,7 @@ import com.qbaaa.secure.auth.exception.RegisterException;
 import com.qbaaa.secure.auth.exception.RestErrorCodeType;
 import com.qbaaa.secure.auth.exception.UnSupportedFileException;
 import com.qbaaa.secure.auth.exception.UsernameAlreadyExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
@@ -27,6 +28,15 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 public class RestResponseEntityExceptionHandler {
 
   private static final String SERVER_ERROR_LOG = "SERVER ERROR, uuid: {}, uri: {}";
+
+  @ExceptionHandler(EntityNotFoundException.class)
+  ResponseEntity<ErrorDetails> handleEntityNotFound(
+      EntityNotFoundException ex, HttpServletRequest request) {
+    var errorCodeType = RestErrorCodeType.NOT_FOUND;
+    var errorDetails = buildErrorDetails(errorCodeType.getErrorType(), ex.getMessage());
+    log.error(SERVER_ERROR_LOG, errorDetails.uuid(), request.getRequestURI(), ex);
+    return ResponseEntity.status(errorCodeType.getHttpStatus()).body(errorDetails);
+  }
 
   @ExceptionHandler(RegisterException.class)
   ResponseEntity<ErrorDetails> handleRegisterException(

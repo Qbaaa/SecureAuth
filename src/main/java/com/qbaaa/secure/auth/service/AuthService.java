@@ -4,7 +4,9 @@ import com.qbaaa.secure.auth.config.security.jwt.JwtService;
 import com.qbaaa.secure.auth.dto.RefreshTokenRequest;
 import com.qbaaa.secure.auth.dto.RegisterRequest;
 import com.qbaaa.secure.auth.event.AccountActiveEvent;
+import com.qbaaa.secure.auth.exception.InputInvalidException;
 import com.qbaaa.secure.auth.exception.RegisterException;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
   private static final String CLAIM_SESSION = "session";
+  private static final String CLAIM_USERNAME = "username";
 
   private final JwtService jwtService;
   private final SessionServer sessionServer;
@@ -38,7 +41,8 @@ public class AuthService {
 
     if (Boolean.TRUE.equals(domain.getIsEnabledVerifiedEmail())) {
       var token =
-          jwtService.createActiveAccountToken(baseUrl, domainName, domain.getEmailTokenValidity());
+          jwtService.createActiveAccountToken(
+              baseUrl, domainName, domain.getEmailTokenValidity(), user.getUsername());
       emailTokenService.createEmailToken(user, domain.getEmailTokenValidity(), token);
       var event =
           new AccountActiveEvent(
@@ -48,6 +52,23 @@ public class AuthService {
     }
 
     return "Created active account";
+  }
+
+  @Transactional
+  public void activeAccount(String baseUrl, String domainName, String token) {
+    var issuer = baseUrl + "/domains/" + domainName;
+    if (Boolean.FALSE.equals(emailTokenService.existsEmailToken(token))) {
+      throw new EntityNotFoundException("Email token not found");
+    }
+
+    var jwtEmail =
+        jwtService
+            .verify(issuer, token)
+            .orElseThrow(() -> new InputInvalidException("Invalid email token"));
+
+    var username = jwtEmail.getClaim(CLAIM_USERNAME).asString();
+    userService.activeAccount(domainName, username);
+    emailTokenService.deleteEmailToken(token);
   }
 
   @Transactional

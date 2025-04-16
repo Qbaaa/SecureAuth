@@ -29,7 +29,8 @@ public class WebSecurityConfig {
     antMatcher("/swagger-ui/**"),
     antMatcher("/api-secure-auth-backend/**"),
     antMatcher("/domains/*/auth/token"),
-    antMatcher("/domains/*/auth/register")
+    antMatcher("/domains/*/auth/register"),
+    antMatcher("/domains/*/auth/account/activate"),
   };
 
   @Bean

@@ -58,13 +58,14 @@ public class JwtService {
   }
 
   public String createActiveAccountToken(
-      String baseUrl, String domainName, Integer emailTokenValidity) {
+      String baseUrl, String domainName, Integer emailTokenValidity, String username) {
     var privateKey = keyService.getPrivateKey(domainName);
     var algorithm = Algorithm.RSA256(null, privateKey);
     var timestamp = timeProvider.getTimestamp();
 
     return JWT.create()
         .withIssuer(baseUrl + PREFIX_ISSUER + domainName)
+        .withClaim(CLAIM_USERNAME, username)
         .withExpiresAt(timestamp.plusSeconds(emailTokenValidity))
         .sign(algorithm);
   }
