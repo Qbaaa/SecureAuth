@@ -4,6 +4,7 @@ import com.qbaaa.secure.auth.config.time.TimeProvider;
 import com.qbaaa.secure.auth.repository.EmailTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,8 @@ public class EmailTokenCleanupJob {
   private final TimeProvider timeProvider;
 
   @Scheduled(cron = "${secureauth.job.cron.emailTokenCleanup}")
+  @SchedulerLock(name = "EmailTokenCleanupJob_deleteExpiredTokens",
+          lockAtLeastFor = "PT30M", lockAtMostFor = "PT35M")
   @Transactional
   public void deleteExpiredTokens() {
     var now = timeProvider.getLocalDateTimeNow();
