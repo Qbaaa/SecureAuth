@@ -18,8 +18,10 @@ public class RefreshTokenCleanupJob {
   private final TimeProvider timeProvider;
 
   @Scheduled(cron = "${secureauth.job.cron.refreshTokenCleanup}")
-  @SchedulerLock(name = "RefreshTokenCleanupJob_deleteExpiredTokens",
-          lockAtLeastFor = "PT30M", lockAtMostFor = "PT35M")
+  @SchedulerLock(
+      name = "RefreshTokenCleanupJob_deleteExpiredTokens",
+      lockAtLeastFor = "PT30M",
+      lockAtMostFor = "PT35M")
   @Transactional
   public void deleteExpiredTokens() {
     var now = timeProvider.getLocalDateTimeNow();
