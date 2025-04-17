@@ -1,4 +1,4 @@
-package com.qbaaa.secure.auth.notification;
+package com.qbaaa.secure.auth.service.notification;
 
 import java.util.Map;
 import lombok.RequiredArgsConstructor;

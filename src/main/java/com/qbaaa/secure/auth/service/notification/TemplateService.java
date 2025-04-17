@@ -1,4 +1,4 @@
-package com.qbaaa.secure.auth.notification;
+package com.qbaaa.secure.auth.service.notification;
 
 import com.qbaaa.secure.auth.config.MailConfig;
 import com.qbaaa.secure.auth.exception.SendEmailException;

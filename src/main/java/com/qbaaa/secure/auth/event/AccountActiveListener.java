@@ -1,6 +1,6 @@
 package com.qbaaa.secure.auth.event;
 
-import com.qbaaa.secure.auth.notification.EmailService;
+import com.qbaaa.secure.auth.service.notification.EmailService;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

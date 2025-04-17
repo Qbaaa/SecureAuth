@@ -1,4 +1,4 @@
-package com.qbaaa.secure.auth.notification;
+package com.qbaaa.secure.auth.service.notification;
 
 import lombok.Getter;
 import lombok.Setter;
