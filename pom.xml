@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.3</version>
+		<version>3.4.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.qbaaa</groupId>
@@ -25,6 +25,7 @@
 		<java.format.version>1.26.0</java.format.version>
         <maven.checkstyle.version>3.6.0</maven.checkstyle.version>
         <checkstyle.version>10.23.0</checkstyle.version>
+		<maven.owasp.version>12.1.1</maven.owasp.version>
 	</properties>
 	<dependencies>
 
@@ -332,6 +333,34 @@
                 </executions>
 
             </plugin>
+
+			<plugin>
+				<groupId>org.owasp</groupId>
+				<artifactId>dependency-check-maven</artifactId>
+				<version>${maven.owasp.version}</version>
+				<configuration>
+					<failBuildOnCVSS>7</failBuildOnCVSS>
+					<format>ALL</format>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<version>2.18.0</version>
+				<configuration>
+					<allowSnapshots>false</allowSnapshots>
+					<processProperties>true</processProperties>
+					<processDependencyManagement>true</processDependencyManagement>
+				</configuration>
+			</plugin>
 
 		</plugins>
 
