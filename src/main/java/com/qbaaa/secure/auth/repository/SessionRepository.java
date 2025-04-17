@@ -28,4 +28,14 @@ public interface SessionRepository extends JpaRepository<SessionEntity, Long> {
                 where s.sessionToken = :sessionToken
                 """)
   int deleteBySessionToken(UUID sessionToken);
+
+  @Transactional
+  @Modifying
+  @Query(
+      """
+               delete
+               from SessionEntity s
+               where s.expiresAt < :expiresAt
+               """)
+  int deleteByExpiresAtLessThan(LocalDateTime expiresAt);
 }

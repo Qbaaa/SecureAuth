@@ -62,3 +62,8 @@ secureauth:
     notificationEmail: notification@test.com
     activeAccountTemplate: active-email.ftl
     activationPath: /domains/%s/auth/account/activate?token=%s
+  job:
+    cron:
+      refreshTokenCleanup: 0 0 2 * * *
+      emailTokenCleanup: 0 0 1 * * *
+      sessionCleanup: 0 0 3 * * *

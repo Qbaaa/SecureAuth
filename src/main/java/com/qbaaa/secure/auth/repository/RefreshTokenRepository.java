@@ -1,6 +1,7 @@
 package com.qbaaa.secure.auth.repository;
 
 import com.qbaaa.secure.auth.entity.RefreshTokenEntity;
+import java.time.LocalDateTime;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -25,4 +26,14 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshTokenEntity
                 where r.token = :token
                 """)
   boolean existsRefreshToken(String token);
+
+  @Transactional
+  @Modifying
+  @Query(
+      """
+                delete
+                from RefreshTokenEntity r
+                where r.expiresAt < :expiresAt
+                """)
+  int deleteByExpiresAtLessThan(LocalDateTime expiresAt);
 }
