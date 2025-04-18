@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS shedlock
+CREATE TABLE IF NOT EXISTS secureauth.shedlock
 (
     name       VARCHAR(64) NOT NULL,
     lock_until TIMESTAMP(3) NULL,

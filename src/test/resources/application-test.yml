@@ -27,3 +27,6 @@ secureauth:
     user: adminTest
     email: adminTest@examplee.com
     password: secretPassword
+
+shedlock:
+  enabled: false
