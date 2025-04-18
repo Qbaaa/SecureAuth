@@ -27,9 +27,9 @@ spring:
     name: auth
 
   datasource:
-    url: jdbc:postgresql://localhost:25432/predictstockprices_db?currentSchema=secureauth
-    username: stockpriceuser
-    password: secret1!
+    url: jdbc:postgresql://${DB_HOSTNAME}:${DB_PORT}/${DB_NAME}?currentSchema=secureauth
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:

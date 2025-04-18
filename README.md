@@ -40,3 +40,14 @@ mvn spotless:check
 ```sh
 mvn spotless:apply
 ```
+
+## Running via docker
+docker compose --env-file .docker/env/app.env --profile db up -d --build --force-recreate
+
+docker-compose --env-file .docker/env/app.env --profile db down
+
+docker-compose --env-file .docker/env/app.env up -d --build --force-recreate postgres mail secureauth
+
+docker rmi $(docker images -f "dangling=true" -q)  
+docker volume rm $(docker volume ls -qf dangling=true)
+docker network rm $(docker network ls -qf dangling=true)

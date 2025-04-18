@@ -3,24 +3,24 @@ FROM maven:3.9.6-eclipse-temurin-21 AS builder
 ARG USER=appuser
 ARG ID=1005
 
-RUN groupadd --gid ${ID} ${USER} && userad --gid ${ID} --uid ${ID} -m ${USER}
+RUN groupadd --gid ${ID} ${USER} && useradd --gid ${ID} --uid ${ID} -m ${USER}
 
 USER ${USER}:${USER}
 
 WORKDIR /home/appuser/build
 
-COPY pom.xml .
-COPY checkstyle ./checkstyle
-COPY src ./src
+COPY ../pom.xml .
+COPY ../checkstyle ./checkstyle
+COPY ../src ./src
 
-RUN mvn clean package
+RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:21-jdk
 
 ARG USER=appuser
 ARG ID=1005
 
-RUN groupadd --gid ${ID} ${USER} && userad --gid ${ID} --uid ${ID} -m ${USER}
+RUN groupadd --gid ${ID} ${USER} && useradd --gid ${ID} --uid ${ID} -m ${USER}
 
 USER ${USER}:${USER}
 
