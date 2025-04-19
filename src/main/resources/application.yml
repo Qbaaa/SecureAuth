@@ -26,10 +26,13 @@ spring:
   application:
     name: auth
 
+  config:
+    import: optional:configtree:/run/secrets/
+
   datasource:
     url: jdbc:postgresql://${DB_HOSTNAME}:${DB_PORT}/${DB_NAME}?currentSchema=secureauth
     username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    password: ${secureauth.db.password}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -46,11 +49,9 @@ spring:
     host: localhost
     port: 1125
 
-
   docker:
     compose:
       enabled: false
-
 
 secureauth:
   main:

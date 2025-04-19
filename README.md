@@ -51,3 +51,12 @@ docker-compose --env-file .docker/env/app.env up -d --build --force-recreate pos
 docker rmi $(docker images -f "dangling=true" -q)  
 docker volume rm $(docker volume ls -qf dangling=true)
 docker network rm $(docker network ls -qf dangling=true)
+
+docker compose --env-file .docker/env/app.env --profile db logs -f postgres
+
+docker compose exec <serviceName> sh
+exit
+
+docker compose up -d --scale secureauth=4
+-potrs
+-name

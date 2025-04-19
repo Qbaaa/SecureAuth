@@ -5,11 +5,13 @@ services:
     hostname: postgres
     profiles: [ "db" ]
     restart: always
-    env_file:
-      - ./.docker/env/db/${APP_ENV}.env
     ports:
 #      - "host_port:container_port"
       - "127.0.0.1:25432:5432"
+    env_file:
+      - ./.docker/env/db/${APP_ENV}.env
+    secrets:
+      - secureauth.db.password
     volumes:
       - stockprices_data:/var/lib/postgresql/data
       - ./.docker/sql-scripts:/docker-entrypoint-initdb.d
@@ -35,18 +37,20 @@ services:
       context: .
       dockerfile: .docker/secureauth.dockerfile
     container_name: secureauth
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
     env_file:
       - ./.docker/env/secureauth/${APP_ENV}.env
+    secrets:
+      - secureauth.db.password
+    networks:
+      - stockprices_network
     command:
       - sh
       - -c
       - java -jar /home/appuser/app/authsecure.jar
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
-    networks:
-      - stockprices_network
 
 volumes:
   stockprices_data:
@@ -54,3 +58,7 @@ volumes:
 networks:
   stockprices_network:
     driver: bridge
+
+secrets:
+  secureauth.db.password:
+    file: ./.docker/secrets/${SECRET_ENV}/secureauth/db.password.txt
