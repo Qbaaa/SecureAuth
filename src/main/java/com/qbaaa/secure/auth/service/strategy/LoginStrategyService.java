@@ -7,12 +7,14 @@ import com.qbaaa.secure.auth.dto.LoginRequest;
 import com.qbaaa.secure.auth.dto.TokenResponse;
 import com.qbaaa.secure.auth.entity.RoleEntity;
 import com.qbaaa.secure.auth.exception.LoginException;
+import com.qbaaa.secure.auth.exception.UserNoActiveAccount;
 import com.qbaaa.secure.auth.service.DomainService;
 import com.qbaaa.secure.auth.service.PasswordService;
 import com.qbaaa.secure.auth.service.RefreshTokenService;
 import com.qbaaa.secure.auth.service.SessionServer;
 import com.qbaaa.secure.auth.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,8 +39,12 @@ public class LoginStrategyService extends AuthStrategy {
     }
 
     var user = userOpt.get();
-    if (!passwordService.validatePassword(user.getUsername(), login.getPassword())) {
+    if (!passwordService.validatePassword(user, login.getPassword())) {
       throw new LoginException("Bad username or password");
+    }
+
+    if (BooleanUtils.isFalse(user.getIsActive())) {
+      throw new UserNoActiveAccount(user.getUsername(), domainName);
     }
 
     final var configDomain = domainService.getDomainConfigValidity(domainName);

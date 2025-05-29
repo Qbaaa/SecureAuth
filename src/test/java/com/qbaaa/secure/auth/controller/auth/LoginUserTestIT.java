@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -166,6 +167,43 @@ class LoginUserTestIT {
                     () ->
                         Assertions.assertEquals(
                             RestErrorCodeType.CREDENTIALS_INVALIDATION.getErrorType(),
+                            errorResponse.code()));
+              });
+
+    } catch (Exception e) {
+      Assertions.fail("ERROR: " + e.getMessage());
+    }
+  }
+
+  @Test
+  @Sql(scripts = "classpath:test/db/clean_all_data.sql")
+  @Sql(scripts = "classpath:test/db/data/auth/post_login.sql")
+  void shouldNoLoginUserToAppWhenUserNoActiveAccount() {
+    try {
+      // given
+      final var domainName = "test-domain";
+      final var loginRequest = new LoginRequest("user003NoActive", "secretUser003");
+
+      // when
+      mockMvc
+          .perform(
+              MockMvcRequestBuilders.post(API_POST_LOGIN, domainName)
+                  .content(objectMapper.writeValueAsString(loginRequest))
+                  .contentType(MediaType.APPLICATION_JSON_VALUE))
+          // then
+          .andExpect(
+              result -> {
+                Assertions.assertEquals(
+                    HttpStatus.FORBIDDEN.value(), result.getResponse().getStatus());
+                final var errorResponse =
+                    objectMapper.readValue(
+                        result.getResponse().getContentAsByteArray(), ErrorDetails.class);
+                Assertions.assertNotNull(errorResponse);
+                assertAll(
+                    "CHECK API RESPONSE",
+                    () ->
+                        Assertions.assertEquals(
+                            RestErrorCodeType.USER_NO_ACTIVE_ACCOUNT.getErrorType(),
                             errorResponse.code()));
               });
 

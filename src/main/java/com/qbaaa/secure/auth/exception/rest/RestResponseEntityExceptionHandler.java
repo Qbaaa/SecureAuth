@@ -7,6 +7,7 @@ import com.qbaaa.secure.auth.exception.LoginException;
 import com.qbaaa.secure.auth.exception.RegisterException;
 import com.qbaaa.secure.auth.exception.RestErrorCodeType;
 import com.qbaaa.secure.auth.exception.UnSupportedFileException;
+import com.qbaaa.secure.auth.exception.UserNoActiveAccount;
 import com.qbaaa.secure.auth.exception.UsernameAlreadyExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -77,6 +78,15 @@ public class RestResponseEntityExceptionHandler {
   @ExceptionHandler(LoginException.class)
   ResponseEntity<ErrorDetails> handleLoginException(LoginException ex, HttpServletRequest request) {
     var errorCodeType = RestErrorCodeType.CREDENTIALS_INVALIDATION;
+    var errorDetails = buildErrorDetails(errorCodeType.getErrorType(), ex.getMessage());
+    log.error(SERVER_ERROR_LOG, errorDetails.uuid(), request.getRequestURI(), ex);
+    return ResponseEntity.status(errorCodeType.getHttpStatus()).body(errorDetails);
+  }
+
+  @ExceptionHandler(UserNoActiveAccount.class)
+  ResponseEntity<ErrorDetails> handleUserNoActiveAccount(
+      UserNoActiveAccount ex, HttpServletRequest request) {
+    var errorCodeType = RestErrorCodeType.USER_NO_ACTIVE_ACCOUNT;
     var errorDetails = buildErrorDetails(errorCodeType.getErrorType(), ex.getMessage());
     log.error(SERVER_ERROR_LOG, errorDetails.uuid(), request.getRequestURI(), ex);
     return ResponseEntity.status(errorCodeType.getHttpStatus()).body(errorDetails);
