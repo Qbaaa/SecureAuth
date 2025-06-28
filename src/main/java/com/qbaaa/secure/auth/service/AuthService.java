@@ -1,11 +1,14 @@
 package com.qbaaa.secure.auth.service;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.qbaaa.secure.auth.config.security.jwt.JwtService;
 import com.qbaaa.secure.auth.dto.RefreshTokenRequest;
 import com.qbaaa.secure.auth.dto.RegisterRequest;
+import com.qbaaa.secure.auth.entity.DomainEntity;
+import com.qbaaa.secure.auth.entity.UserEntity;
 import com.qbaaa.secure.auth.event.AccountActiveEvent;
-import com.qbaaa.secure.auth.exception.InputInvalidException;
 import com.qbaaa.secure.auth.exception.RegisterException;
+import com.qbaaa.secure.auth.util.IssuerUtils;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -31,42 +34,21 @@ public class AuthService {
 
   @Transactional
   public String register(String baseUrl, String domainName, RegisterRequest registerRequest) {
-
     var domain = domainService.getDomain(domainName);
-    if (Boolean.FALSE.equals(domain.getIsEnabledRegister())) {
-      throw new RegisterException("Registration is disabled for this domain");
-    }
-
+    validateRegisterEnabled(domain);
     var user = userService.register(domain, registerRequest);
 
-    if (Boolean.TRUE.equals(domain.getIsEnabledVerifiedEmail())) {
-      var token =
-          jwtService.createActiveAccountToken(
-              baseUrl, domainName, domain.getEmailTokenValidity(), user.getUsername());
-      emailTokenService.createEmailToken(user, domain.getEmailTokenValidity(), token);
-      var event =
-          new AccountActiveEvent(
-              baseUrl, domain.getName(), user.getUsername(), user.getEmail(), token);
-      eventPublisher.publishEvent(event);
-      return "Sent email with link activate account";
-    }
-
-    return "Created active account";
+    return Boolean.TRUE.equals(domain.getIsEnabledVerifiedEmail())
+        ? sendVerificationEmail(baseUrl, domainName, domain, user)
+        : "Created active account";
   }
 
   @Transactional
   public void activeAccount(String baseUrl, String domainName, String token) {
-    var issuer = baseUrl + "/domains/" + domainName;
-    if (Boolean.FALSE.equals(emailTokenService.existsEmailToken(token))) {
-      throw new EntityNotFoundException("Email token not found");
-    }
-
-    var jwtEmail =
-        jwtService
-            .verify(issuer, token)
-            .orElseThrow(() -> new InputInvalidException("Invalid email token"));
-
-    var username = jwtEmail.getClaim(CLAIM_USERNAME).asString();
+    var issuer = IssuerUtils.buildIssuer(baseUrl, domainName);
+    validateEmailTokenExists(token);
+    var jwt = verifyToken(issuer, token, "Invalid email token");
+    var username = jwt.getClaim(CLAIM_USERNAME).asString();
     userService.activeAccount(domainName, username);
     emailTokenService.deleteEmailToken(token);
   }
@@ -74,19 +56,55 @@ public class AuthService {
   @Transactional
   public void logout(String domainName, String baseUrl, RefreshTokenRequest refreshTokenRequest) {
     var refreshToken = refreshTokenRequest.getToken();
-    if (!refreshTokenService.existsRefreshToken(refreshToken)) {
-      throw new BadCredentialsException("Refresh token not found");
-    }
-    var issuer = baseUrl + "/domains/" + domainName;
-    var authenticated =
-        jwtService
-            .verify(issuer, refreshToken)
-            .orElseThrow(() -> new BadCredentialsException("Invalid refresh token"));
-
-    var session = authenticated.getClaim(CLAIM_SESSION).asString();
-    var sessionUuid = UUID.fromString(session);
+    validateRefreshTokenExists(refreshToken);
+    var issuer = IssuerUtils.buildIssuer(baseUrl, domainName);
+    var jwt = verifyToken(issuer, refreshToken, "Invalid refresh token");
+    var sessionUuid = extractSessionId(jwt);
 
     refreshTokenService.deleteRefreshToken(refreshToken);
     sessionServer.delete(sessionUuid);
+  }
+
+  private void validateRegisterEnabled(DomainEntity domain) {
+    if (Boolean.FALSE.equals(domain.getIsEnabledRegister())) {
+      throw new RegisterException("Registration is disabled for this domain");
+    }
+  }
+
+  private String sendVerificationEmail(
+      String baseUrl, String domainName, DomainEntity domain, UserEntity user) {
+    var token =
+        jwtService.createActiveAccountToken(
+            baseUrl, domainName, domain.getEmailTokenValidity(), user.getUsername());
+
+    emailTokenService.createEmailToken(user, domain.getEmailTokenValidity(), token);
+
+    eventPublisher.publishEvent(
+        new AccountActiveEvent(baseUrl, domainName, user.getUsername(), user.getEmail(), token));
+
+    return "Sent email with link activate account";
+  }
+
+  private void validateEmailTokenExists(String token) {
+    if (!emailTokenService.existsEmailToken(token)) {
+      throw new EntityNotFoundException("Email token not found");
+    }
+  }
+
+  private void validateRefreshTokenExists(String token) {
+    if (!refreshTokenService.existsRefreshToken(token)) {
+      throw new BadCredentialsException("Refresh token not found");
+    }
+  }
+
+  private DecodedJWT verifyToken(
+      String issuer, String token, String errorMessage) {
+    return jwtService
+        .verify(issuer, token)
+        .orElseThrow(() -> new BadCredentialsException(errorMessage));
+  }
+
+  private UUID extractSessionId(DecodedJWT jwt) {
+    return UUID.fromString(jwt.getClaim(CLAIM_SESSION).asString());
   }
 }

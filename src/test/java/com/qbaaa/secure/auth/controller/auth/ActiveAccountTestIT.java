@@ -206,7 +206,7 @@ class ActiveAccountTestIT {
           .andExpect(
               result -> {
                 Assertions.assertEquals(
-                    HttpStatus.BAD_REQUEST.value(), result.getResponse().getStatus());
+                    HttpStatus.UNAUTHORIZED.value(), result.getResponse().getStatus());
 
                 assertAll(
                     "CHECK TABLES DATA AFTER ACTIVE ACCOUNT",

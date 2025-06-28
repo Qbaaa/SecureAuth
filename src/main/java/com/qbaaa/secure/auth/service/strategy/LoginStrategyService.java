@@ -6,13 +6,16 @@ import com.qbaaa.secure.auth.dto.ClaimJwtDto;
 import com.qbaaa.secure.auth.dto.LoginRequest;
 import com.qbaaa.secure.auth.dto.TokenResponse;
 import com.qbaaa.secure.auth.entity.RoleEntity;
+import com.qbaaa.secure.auth.entity.UserEntity;
 import com.qbaaa.secure.auth.exception.LoginException;
 import com.qbaaa.secure.auth.exception.UserNoActiveAccount;
+import com.qbaaa.secure.auth.projection.DomainConfigValidityProjection;
 import com.qbaaa.secure.auth.service.DomainService;
 import com.qbaaa.secure.auth.service.PasswordService;
 import com.qbaaa.secure.auth.service.RefreshTokenService;
 import com.qbaaa.secure.auth.service.SessionServer;
 import com.qbaaa.secure.auth.service.UserService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
@@ -32,7 +35,24 @@ public class LoginStrategyService extends AuthStrategy {
   @Transactional
   public TokenResponse authenticate(String domainName, String baseUrl, AuthRequest request) {
     var login = (LoginRequest) request;
+    var user = authenticateUser(domainName, login);
+    validateUserIsActive(domainName, user);
 
+    final var configDomain = getDomainConfig(domainName);
+    final var session = sessionServer.createSession(user, configDomain.getSessionValidity());
+
+    final var accessToken =
+        generateAccessToken(domainName, baseUrl, session.getSessionToken(), user, configDomain);
+    final var refreshToken =
+        generateRefreshToken(baseUrl, domainName, session.getSessionToken(), configDomain);
+
+    refreshTokenService.createRefreshToken(
+        user, configDomain.getRefreshTokenValidity(), refreshToken);
+
+    return new TokenResponse(accessToken, refreshToken);
+  }
+
+  private UserEntity authenticateUser(String domainName, LoginRequest login) {
     var userOpt = userService.findUserInDomain(domainName, login.getUsername());
     if (userOpt.isEmpty()) {
       throw new LoginException("Bad username or password");
@@ -42,33 +62,41 @@ public class LoginStrategyService extends AuthStrategy {
     if (!passwordService.validatePassword(user, login.getPassword())) {
       throw new LoginException("Bad username or password");
     }
+    return user;
+  }
 
+  private void validateUserIsActive(String domainName, UserEntity user) {
     if (BooleanUtils.isFalse(user.getIsActive())) {
       throw new UserNoActiveAccount(user.getUsername(), domainName);
     }
+  }
 
-    final var configDomain = domainService.getDomainConfigValidity(domainName);
-    final var session = sessionServer.createSession(user, configDomain.getSessionValidity());
-    final var roles = user.getRoles().stream().map(RoleEntity::getName).toList();
-    final var claimJwtDto =
+  private DomainConfigValidityProjection getDomainConfig(String domainName) {
+    return domainService.getDomainConfigValidity(domainName);
+  }
+
+  private String generateAccessToken(
+      String domainName,
+      String baseUrl,
+      UUID sessionId,
+      UserEntity user,
+      DomainConfigValidityProjection config) {
+    var roles = user.getRoles().stream().map(RoleEntity::getName).toList();
+    var claims =
         new ClaimJwtDto(
             domainName,
             user.getUsername(),
             user.getEmail(),
             roles,
             baseUrl,
-            session.getSessionToken().toString(),
-            configDomain.getAccessTokenValidity());
-    final var accessToken = jwtService.createAccessToken(claimJwtDto);
-    final var refreshToken =
-        jwtService.createRefreshToken(
-            baseUrl,
-            domainName,
-            session.getSessionToken().toString(),
-            configDomain.getRefreshTokenValidity());
-    refreshTokenService.createRefreshToken(
-        user, configDomain.getRefreshTokenValidity(), refreshToken);
+            sessionId.toString(),
+            config.getAccessTokenValidity());
+    return jwtService.createAccessToken(claims);
+  }
 
-    return new TokenResponse(accessToken, refreshToken);
+  private String generateRefreshToken(
+      String baseUrl, String domainName, UUID sessionId, DomainConfigValidityProjection config) {
+    return jwtService.createRefreshToken(
+        baseUrl, domainName, sessionId.toString(), config.getRefreshTokenValidity());
   }
 }
