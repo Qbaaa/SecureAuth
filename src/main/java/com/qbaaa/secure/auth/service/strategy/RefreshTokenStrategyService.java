@@ -45,8 +45,10 @@ public class RefreshTokenStrategyService extends AuthStrategy {
     final var user = loadUser(sessionUuid);
     final var configDomain = getDomainConfig(domainName);
 
-    final var accessToken = generateAccessToken(domainName, baseUrl, sessionUuid, user, configDomain);
-    final var refreshTokenNew = generateRefreshToken(baseUrl, domainName, sessionUuid, configDomain);
+    final var accessToken =
+        generateAccessToken(domainName, baseUrl, sessionUuid, user, configDomain);
+    final var refreshTokenNew =
+        generateRefreshToken(baseUrl, domainName, sessionUuid, configDomain);
 
     rotateToken(user, configDomain, refreshTokenOld, refreshTokenNew);
 

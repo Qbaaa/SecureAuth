@@ -7,6 +7,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.qbaaa.secure.auth.config.time.TimeProvider;
 import com.qbaaa.secure.auth.dto.ClaimJwtDto;
 import com.qbaaa.secure.auth.service.KeyService;
+import com.qbaaa.secure.auth.util.IssuerUtils;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,15 +27,13 @@ public class JwtService {
   private static final String CLAIM_SESSION = "session";
   private static final String CLAIM_DOMAIN = "domain";
 
-  private static final String PREFIX_ISSUER = "/domains/";
-
   public String createAccessToken(ClaimJwtDto claimJwt) {
     var privateKey = keyService.getPrivateKey(claimJwt.domainName());
     var algorithm = Algorithm.RSA256(null, privateKey);
     var timestamp = timeProvider.getTimestamp();
 
     return JWT.create()
-        .withIssuer(claimJwt.baseUrl() + PREFIX_ISSUER + claimJwt.domainName())
+        .withIssuer(IssuerUtils.buildIssuer(claimJwt.baseUrl(), claimJwt.domainName()))
         .withClaim(CLAIM_USERNAME, claimJwt.username())
         .withClaim(CLAIM_EMAIL, claimJwt.email())
         .withClaim(CLAIM_SESSION, claimJwt.session())
@@ -51,7 +50,7 @@ public class JwtService {
     var timestamp = timeProvider.getTimestamp();
 
     return JWT.create()
-        .withIssuer(baseUrl + PREFIX_ISSUER + domainName)
+        .withIssuer(IssuerUtils.buildIssuer(baseUrl, domainName))
         .withClaim(CLAIM_SESSION, session)
         .withExpiresAt(timestamp.plusSeconds(refreshTokenValidity))
         .sign(algorithm);
@@ -64,7 +63,7 @@ public class JwtService {
     var timestamp = timeProvider.getTimestamp();
 
     return JWT.create()
-        .withIssuer(baseUrl + PREFIX_ISSUER + domainName)
+        .withIssuer(IssuerUtils.buildIssuer(baseUrl, domainName))
         .withClaim(CLAIM_USERNAME, username)
         .withExpiresAt(timestamp.plusSeconds(emailTokenValidity))
         .sign(algorithm);

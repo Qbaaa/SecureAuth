@@ -3,6 +3,7 @@ package com.qbaaa.secure.auth.config.security.jwt;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 import com.qbaaa.secure.auth.config.SecureAuthProperties;
+import com.qbaaa.secure.auth.util.IssuerUtils;
 import com.qbaaa.secure.auth.util.UrlUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -38,7 +39,7 @@ public class CustomJwtAuthenticationFilter extends OncePerRequestFilter {
     if (StringUtils.hasText(authHeader) && authHeader.startsWith(TOKEN_PREFIX)) {
       var token = authHeader.substring(TOKEN_PREFIX.length());
       var baseUrl = UrlUtil.getBaseUrl(request);
-      var issuer = baseUrl + PREFIX_ISSUER + secureAuthProperties.getDomain();
+      var issuer = IssuerUtils.buildIssuer(baseUrl, secureAuthProperties.getDomain());
       if (request.getRequestURL().toString().startsWith(baseUrl + PREFIX_ISSUER)) {
         issuer = UrlUtil.extractDomain(request);
       }

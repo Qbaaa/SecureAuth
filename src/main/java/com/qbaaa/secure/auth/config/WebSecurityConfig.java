@@ -1,7 +1,5 @@
 package com.qbaaa.secure.auth.config;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
-
 import com.qbaaa.secure.auth.config.security.jwt.CustomJwtAuthenticationFilter;
 import com.qbaaa.secure.auth.config.security.jwt.CustomJwtAuthenticationProvider;
 import com.qbaaa.secure.auth.config.security.jwt.CustomJwtConverter;
@@ -19,18 +17,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 public class WebSecurityConfig {
 
-  private static final AntPathRequestMatcher[] WHITE_LIST = {
-    antMatcher("/swagger-ui/**"),
-    antMatcher("/api-secure-auth-backend/**"),
-    antMatcher("/domains/*/auth/token"),
-    antMatcher("/domains/*/auth/register"),
-    antMatcher("/domains/*/auth/account/activate"),
+  private static final String[] WHITE_LIST = {
+    "/swagger-ui/**",
+    "/api-secure-auth-backend/**",
+    "/domains/*/auth/token",
+    "/domains/*/auth/register",
+    "/domains/*/auth/account/activate",
   };
 
   @Bean

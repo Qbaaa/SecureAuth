@@ -1,8 +1,9 @@
 package com.qbaaa.secure.auth.config.security.jwt;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,16 +16,15 @@ public class CustomJwtConverter implements Converter<DecodedJWT, Collection<Gran
 
   @Override
   public Collection<GrantedAuthority> convert(DecodedJWT jwt) {
-    Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-
     var domain = jwt.getClaim(CLAIM_DOMAIN).asString();
-    jwt.getClaim(CLAIM_ROLES)
-        .asList(String.class)
-        .forEach(
-            role ->
-                grantedAuthorities.add(
-                    new SimpleGrantedAuthority(AUTHORITY_PREFIX + domain + "__" + role)));
+    var roles = jwt.getClaim(CLAIM_ROLES).asList(String.class);
 
-    return grantedAuthorities;
+    if (domain == null || roles == null) {
+      return List.of();
+    }
+
+    return roles.stream()
+        .map(role -> new SimpleGrantedAuthority(AUTHORITY_PREFIX + domain + "__" + role))
+        .collect(Collectors.toList());
   }
 }

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.3</version>
+		<version>3.5.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.qbaaa</groupId>
@@ -18,7 +18,7 @@
 		<org.mapstruct.version>1.6.3</org.mapstruct.version>
 		<com.auth0.java-jwt>4.5.0</com.auth0.java-jwt>
 		<antisamy.version>1.7.7</antisamy.version>
-		<apache.tika.version>3.1.0</apache.tika.version>
+		<apache.tika.version>3.2.2</apache.tika.version>
 		<org.springdoc.openapi-starter>2.8.6</org.springdoc.openapi-starter>
 		<jacoco.version>0.8.13</jacoco.version>
 		<maven.spotless.version>2.44.4</maven.spotless.version>

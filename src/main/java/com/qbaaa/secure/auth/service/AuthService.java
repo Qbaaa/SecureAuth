@@ -97,8 +97,7 @@ public class AuthService {
     }
   }
 
-  private DecodedJWT verifyToken(
-      String issuer, String token, String errorMessage) {
+  private DecodedJWT verifyToken(String issuer, String token, String errorMessage) {
     return jwtService
         .verify(issuer, token)
         .orElseThrow(() -> new BadCredentialsException(errorMessage));
