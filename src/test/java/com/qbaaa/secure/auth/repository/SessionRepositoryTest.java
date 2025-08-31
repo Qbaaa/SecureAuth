@@ -1,6 +1,6 @@
 package com.qbaaa.secure.auth.repository;
 
-import com.qbaaa.secure.auth.entity.SessionEntity;
+import com.qbaaa.secure.auth.auth.infrastructure.entity.SessionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

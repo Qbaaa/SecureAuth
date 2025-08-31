@@ -3,16 +3,16 @@ package com.qbaaa.secure.auth.controller.auth;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.qbaaa.secure.auth.auth.api.dto.LoginRequest;
+import com.qbaaa.secure.auth.auth.api.dto.RefreshTokenRequest;
+import com.qbaaa.secure.auth.auth.api.dto.TokenResponse;
+import com.qbaaa.secure.auth.auth.usecase.strategy.LoginUseCaseStrategy;
 import com.qbaaa.secure.auth.config.ContainerConfiguration;
 import com.qbaaa.secure.auth.config.time.FakeTimeProvider;
 import com.qbaaa.secure.auth.config.time.FakeTimeProviderConfig;
-import com.qbaaa.secure.auth.dto.LoginRequest;
-import com.qbaaa.secure.auth.dto.RefreshTokenRequest;
-import com.qbaaa.secure.auth.dto.TokenResponse;
-import com.qbaaa.secure.auth.exception.rest.ErrorDetails;
 import com.qbaaa.secure.auth.repository.RefreshTokenRepositoryTest;
 import com.qbaaa.secure.auth.repository.SessionRepositoryTest;
-import com.qbaaa.secure.auth.service.strategy.LoginStrategyService;
+import com.qbaaa.secure.auth.shared.exception.rest.ErrorDetails;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +49,7 @@ class RefreshTokenTestIT {
 
   @Autowired private ObjectMapper objectMapper;
 
-  @Autowired private LoginStrategyService loginStrategyService;
+  @Autowired private LoginUseCaseStrategy loginUseCaseStrategy;
 
   @Autowired private SessionRepositoryTest sessionRepositoryTest;
 
@@ -79,7 +79,7 @@ class RefreshTokenTestIT {
       final var domainName = "test-domain";
       var username = "user002";
       var loginRequest = new LoginRequest(username, "secretUser002");
-      var token = loginStrategyService.authenticate(domainName, "http://localhost", loginRequest);
+      var token = loginUseCaseStrategy.authenticate(domainName, "http://localhost", loginRequest);
 
       assertAll(
           "CHECK TABLES DATA BEFORE REFRESH TOKEN",
@@ -157,7 +157,7 @@ class RefreshTokenTestIT {
       final var domainName = "test-domain";
       var username = "user002";
       var loginRequest = new LoginRequest(username, "secretUser002");
-      var token = loginStrategyService.authenticate(domainName, "http://localhost", loginRequest);
+      var token = loginUseCaseStrategy.authenticate(domainName, "http://localhost", loginRequest);
 
       assertAll(
           "CHECK TABLES DATA BEFORE REFRESH TOKEN",
@@ -205,7 +205,7 @@ class RefreshTokenTestIT {
       final var domainName = "test-domain";
       var username = "user002";
       var loginRequest = new LoginRequest(username, "secretUser002");
-      var token = loginStrategyService.authenticate(domainName, "http://localhost", loginRequest);
+      var token = loginUseCaseStrategy.authenticate(domainName, "http://localhost", loginRequest);
 
       assertAll(
           "CHECK TABLES DATA BEFORE REFRESH TOKEN",

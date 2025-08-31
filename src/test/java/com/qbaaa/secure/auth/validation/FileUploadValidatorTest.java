@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.qbaaa.secure.auth.exception.UnSupportedFileException;
+import com.qbaaa.secure.auth.shared.exception.UnSupportedFileException;
+import com.qbaaa.secure.auth.shared.validation.AntiSamyValidator;
+import com.qbaaa.secure.auth.shared.validation.FileUploadValidator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

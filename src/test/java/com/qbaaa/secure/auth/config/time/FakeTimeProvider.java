@@ -1,5 +1,6 @@
 package com.qbaaa.secure.auth.config.time;
 
+import com.qbaaa.secure.auth.shared.config.time.TimeProvider;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;

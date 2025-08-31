@@ -1,6 +1,6 @@
 package com.qbaaa.secure.auth.repository;
 
-import com.qbaaa.secure.auth.entity.RefreshTokenEntity;
+import com.qbaaa.secure.auth.auth.infrastructure.entity.RefreshTokenEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

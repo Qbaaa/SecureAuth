@@ -6,6 +6,7 @@ import com.qbaaa.secure.auth.config.ContainerConfiguration;
 import com.qbaaa.secure.auth.config.time.FakeTimeProvider;
 import com.qbaaa.secure.auth.config.time.FakeTimeProviderConfig;
 import com.qbaaa.secure.auth.repository.EmailTokenRepositoryTest;
+import com.qbaaa.secure.auth.user.infrastructure.job.EmailTokenCleanupJob;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;

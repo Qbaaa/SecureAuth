@@ -4,12 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.qbaaa.secure.auth.auth.api.dto.LoginRequest;
+import com.qbaaa.secure.auth.auth.usecase.strategy.LoginUseCaseStrategy;
 import com.qbaaa.secure.auth.config.ContainerConfiguration;
-import com.qbaaa.secure.auth.dto.LoginRequest;
 import com.qbaaa.secure.auth.repository.DomainRepositoryTest;
 import com.qbaaa.secure.auth.repository.RoleRepositoryTest;
 import com.qbaaa.secure.auth.repository.UserRepositoryTest;
-import com.qbaaa.secure.auth.service.strategy.LoginStrategyService;
 import java.io.File;
 import java.io.FileInputStream;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +42,7 @@ class ImportDomainTestIT {
 
   @Autowired private ObjectMapper objectMapper;
 
-  @Autowired private LoginStrategyService loginStrategyService;
+  @Autowired private LoginUseCaseStrategy loginUseCaseStrategy;
 
   @Autowired private DomainRepositoryTest domainRepositoryTest;
 
@@ -74,7 +74,7 @@ class ImportDomainTestIT {
           () -> Assertions.assertEquals(0, userRepositoryTest.countByDomainName(addingDomain)));
 
       var loginRequest = new LoginRequest("user001", "secretUser001");
-      var token = loginStrategyService.authenticate("master", "http://localhost", loginRequest);
+      var token = loginUseCaseStrategy.authenticate("master", "http://localhost", loginRequest);
 
       var file =
           new File(

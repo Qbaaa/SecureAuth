@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.qbaaa.secure.auth.config.SecureAuthProperties;
-import com.qbaaa.secure.auth.dto.DomainTransferDto;
-import com.qbaaa.secure.auth.exception.DomainImportException;
-import com.qbaaa.secure.auth.service.DomainImportService;
+import com.qbaaa.secure.auth.domain.infrastructure.dto.DomainTransferDto;
+import com.qbaaa.secure.auth.domain.usecase.DomainImportUseCase;
+import com.qbaaa.secure.auth.shared.config.SecureAuthProperties;
+import com.qbaaa.secure.auth.shared.exception.DomainImportException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -26,14 +26,14 @@ public class Starter implements ApplicationRunner {
 
   private final ObjectMapper objectMapper;
   private final SecureAuthProperties secureAuthProperties;
-  private final DomainImportService domainImportService;
+  private final DomainImportUseCase domainImportUseCase;
 
   @Override
   public void run(ApplicationArguments args) throws Exception {
     try {
       var jsonContent = loadJsonDomain("import/importMainDomain.json");
       var domainDto = changeConfigurationDomain(jsonContent);
-      domainImportService.importDomainStartApplication(domainDto);
+      domainImportUseCase.importDomainStartApplication(domainDto);
       log.info("Created Main Domain");
     } catch (DomainImportException e) {
       log.warn("Main Domain interrupted, {}", e.getMessage());

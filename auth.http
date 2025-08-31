@@ -43,7 +43,7 @@ Content-Type: application/json
 --boundary123--
 
 ##########################
-POST http://localhost:8080/domains/{{domainName}}/auth/register
+POST http://localhost:8080/domains/{{domainName}}/users/register
 Accept: application/json
 Content-Type: application/json
 

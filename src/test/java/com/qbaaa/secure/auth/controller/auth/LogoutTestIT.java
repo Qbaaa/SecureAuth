@@ -3,12 +3,12 @@ package com.qbaaa.secure.auth.controller.auth;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.qbaaa.secure.auth.auth.api.dto.LoginRequest;
+import com.qbaaa.secure.auth.auth.api.dto.RefreshTokenRequest;
+import com.qbaaa.secure.auth.auth.usecase.strategy.LoginUseCaseStrategy;
 import com.qbaaa.secure.auth.config.ContainerConfiguration;
-import com.qbaaa.secure.auth.dto.LoginRequest;
-import com.qbaaa.secure.auth.dto.RefreshTokenRequest;
 import com.qbaaa.secure.auth.repository.RefreshTokenRepositoryTest;
 import com.qbaaa.secure.auth.repository.SessionRepositoryTest;
-import com.qbaaa.secure.auth.service.strategy.LoginStrategyService;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -43,7 +43,7 @@ class LogoutTestIT {
 
   @Autowired private ObjectMapper objectMapper;
 
-  @Autowired private LoginStrategyService loginStrategyService;
+  @Autowired private LoginUseCaseStrategy loginUseCaseStrategy;
 
   @Autowired private SessionRepositoryTest sessionRepositoryTest;
 
@@ -73,7 +73,7 @@ class LogoutTestIT {
     try {
       // given
       var loginRequest = new LoginRequest(username, password);
-      var token = loginStrategyService.authenticate(domainName, "http://localhost", loginRequest);
+      var token = loginUseCaseStrategy.authenticate(domainName, "http://localhost", loginRequest);
 
       assertAll(
           "CHECK TABLES DATA BEFORE LOGOUT",
@@ -120,7 +120,7 @@ class LogoutTestIT {
       var username = "user001";
       var password = "secretUser001";
       var loginRequest = new LoginRequest(username, password);
-      var token = loginStrategyService.authenticate("master", "http://localhost", loginRequest);
+      var token = loginUseCaseStrategy.authenticate("master", "http://localhost", loginRequest);
 
       assertAll(
           "CHECK TABLES DATA BEFORE LOGOUT",

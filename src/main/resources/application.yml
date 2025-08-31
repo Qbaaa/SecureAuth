@@ -60,9 +60,10 @@ secureauth:
     email: ${SECUREAUTH_ADMIN_EMAIL:}
     password: ${SECUREAUTH_ADMIN_PASSWORD:}
   mail:
-    notificationEmail: notification@test.com
-    activeAccountTemplate: active-email.ftl
-    activationPath: /domains/%s/auth/account/activate?token=%s
+    active-account:
+      sender: notification@test.com
+      template: active-email.ftl
+      path: /domains/%s/users/account/activate?token=%s
   job:
     cron:
       refreshTokenCleanup: 0 0 2 * * *

@@ -3,13 +3,13 @@ package com.qbaaa.secure.auth.controller.auth;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.qbaaa.secure.auth.auth.api.dto.LoginRequest;
+import com.qbaaa.secure.auth.auth.api.dto.TokenResponse;
 import com.qbaaa.secure.auth.config.ContainerConfiguration;
-import com.qbaaa.secure.auth.dto.LoginRequest;
-import com.qbaaa.secure.auth.dto.TokenResponse;
-import com.qbaaa.secure.auth.exception.RestErrorCodeType;
-import com.qbaaa.secure.auth.exception.rest.ErrorDetails;
 import com.qbaaa.secure.auth.repository.RefreshTokenRepositoryTest;
 import com.qbaaa.secure.auth.repository.SessionRepositoryTest;
+import com.qbaaa.secure.auth.shared.exception.RestErrorCodeType;
+import com.qbaaa.secure.auth.shared.exception.rest.ErrorDetails;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;

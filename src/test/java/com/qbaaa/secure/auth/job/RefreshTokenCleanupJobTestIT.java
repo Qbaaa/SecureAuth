@@ -2,6 +2,7 @@ package com.qbaaa.secure.auth.job;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.qbaaa.secure.auth.auth.infrastructure.job.RefreshTokenCleanupJob;
 import com.qbaaa.secure.auth.config.ContainerConfiguration;
 import com.qbaaa.secure.auth.config.time.FakeTimeProvider;
 import com.qbaaa.secure.auth.config.time.FakeTimeProviderConfig;
