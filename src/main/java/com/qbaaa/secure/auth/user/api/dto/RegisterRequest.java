@@ -14,4 +14,9 @@ public record RegisterRequest(
         @Email
         @Pattern(regexp = "^[A-Za-z0-9@_.-]+$", message = "Email contains forbidden characters")
         String email,
-    @NotBlank(message = "Password is required") @Size(min = 6) String password) {}
+    @NotBlank(message = "Password is required")
+        @Size(min = 8, max = 64, message = "Password must be at least 8 characters long")
+        String password,
+    @NotBlank(message = "Confirm password is required")
+        @Size(min = 8, max = 64, message = "Password must be at least 8 characters long")
+        String confirmPassword) {}

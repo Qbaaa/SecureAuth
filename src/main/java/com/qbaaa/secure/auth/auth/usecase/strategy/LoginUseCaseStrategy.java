@@ -17,12 +17,15 @@ import com.qbaaa.secure.auth.user.infrastructure.entity.RoleEntity;
 import com.qbaaa.secure.auth.user.infrastructure.entity.UserEntity;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service("password")
 @RequiredArgsConstructor
+@Slf4j
 public class LoginUseCaseStrategy extends AuthStrategy {
 
   private final DomainService domainService;
@@ -31,12 +34,14 @@ public class LoginUseCaseStrategy extends AuthStrategy {
   private final SessionService sessionService;
   private final RefreshTokenService refreshTokenService;
   private final JwtService jwtService;
+  private final CompromisedPasswordChecker compromisedPasswordChecker;
 
   @Transactional
   public TokenResponse authenticate(String domainName, String baseUrl, AuthRequest request) {
     var login = (LoginRequest) request;
     var user = authenticateUser(domainName, login);
     validateUserIsActive(domainName, user);
+    validatePassword(login.getPassword());
 
     final var configDomain = getDomainConfig(domainName);
     final var session = sessionService.createSession(user, configDomain.getSessionValidity());
@@ -98,5 +103,12 @@ public class LoginUseCaseStrategy extends AuthStrategy {
       String baseUrl, String domainName, UUID sessionId, DomainConfigValidityProjection config) {
     return jwtService.createRefreshToken(
         baseUrl, domainName, sessionId.toString(), config.getRefreshTokenValidity());
+  }
+
+  private void validatePassword(final String password) {
+    if (!password.isBlank() && compromisedPasswordChecker.check(password).isCompromised()) {
+      log.warn(
+          "The password unsafe because it's well-known to hackers. You must change your password.");
+    }
   }
 }

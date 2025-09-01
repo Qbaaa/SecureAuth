@@ -18,6 +18,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.password.CompromisedPasswordException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -156,6 +157,15 @@ public class RestResponseEntityExceptionHandler {
   ResponseEntity<ErrorDetails> handleDomainExistsException(
       DomainExistsException ex, HttpServletRequest request) {
     var errorCodeType = RestErrorCodeType.DOMAIN_ALREADY_EXISTS;
+    var errorDetails = buildErrorDetails(errorCodeType.getErrorType(), ex.getMessage());
+    log.error(SERVER_ERROR_LOG, errorDetails.uuid(), request.getRequestURI(), ex);
+    return ResponseEntity.status(errorCodeType.getHttpStatus()).body(errorDetails);
+  }
+
+  @ExceptionHandler(CompromisedPasswordException.class)
+  ResponseEntity<ErrorDetails> handleCompromisedPasswordException(
+      CompromisedPasswordException ex, HttpServletRequest request) {
+    var errorCodeType = RestErrorCodeType.COMPROMISED_PASSWORD;
     var errorDetails = buildErrorDetails(errorCodeType.getErrorType(), ex.getMessage());
     log.error(SERVER_ERROR_LOG, errorDetails.uuid(), request.getRequestURI(), ex);
     return ResponseEntity.status(errorCodeType.getHttpStatus()).body(errorDetails);

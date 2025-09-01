@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.password.CompromisedPasswordChecker;
+import org.springframework.security.authentication.password.CompromisedPasswordException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,6 +29,7 @@ public class UserService {
   private final PasswordService passwordService;
   private final RoleService roleService;
   private final UserMapper userMapper;
+  private final CompromisedPasswordChecker compromisedPasswordChecker;
 
   public void assignUsersToDomain(
       DomainEntity domain, List<UserTransferDto> usersImport, List<RoleEntity> rolesDomain) {
@@ -71,6 +74,7 @@ public class UserService {
       throw new EmailAlreadyExistsException(
           "Email is already in use. Please choose a different one.");
     }
+    validatePassword(registerRequest.password());
 
     var assignRolesToUser = roleService.getRolesToRegisterUser(domain.getName());
     var userEntity =
@@ -90,5 +94,13 @@ public class UserService {
 
     user.setIsActive(Boolean.TRUE);
     userRepository.save(user);
+  }
+
+  private void validatePassword(final String password) {
+    if (!password.isBlank() && compromisedPasswordChecker.check(password).isCompromised()) {
+      throw new CompromisedPasswordException(
+          "The password unsafe because it's well-known to hackers. "
+              + "Please choose a different password that's harder to guess");
+    }
   }
 }

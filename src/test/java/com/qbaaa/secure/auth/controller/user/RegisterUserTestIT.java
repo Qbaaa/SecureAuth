@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qbaaa.secure.auth.config.ContainerConfiguration;
 import com.qbaaa.secure.auth.repository.UserRepositoryTest;
+import com.qbaaa.secure.auth.shared.exception.RestErrorCodeType;
+import com.qbaaa.secure.auth.shared.exception.rest.ErrorDetails;
 import com.qbaaa.secure.auth.user.api.dto.RegisterRequest;
 import com.qbaaa.secure.auth.user.infrastructure.repository.EmailTokenRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +59,8 @@ class RegisterUserTestIT {
       // given
       final var domainName = "test-domain";
       var username = "newUser007";
-      var registerRequest = new RegisterRequest(username, "newUser@test.com", "secret007");
+      var password = "newSecret007";
+      var registerRequest = new RegisterRequest(username, "newUser@test.com", password, password);
 
       assertAll(
           "CHECK TABLES DATA BEFORE REGISTER",
@@ -105,7 +108,8 @@ class RegisterUserTestIT {
       // given
       final var domainName = "test-domain-002";
       var username = "newUser001";
-      var registerRequest = new RegisterRequest(username, "newUser@test.com", "secret001");
+      var password = "newSecret001";
+      var registerRequest = new RegisterRequest(username, "newUser@test.com", password, password);
 
       assertAll(
           "CHECK TABLES DATA BEFORE REGISTER",
@@ -156,7 +160,9 @@ class RegisterUserTestIT {
       // given
       final var domainName = "master";
       var username = "newUser007";
-      var registerRequest = new RegisterRequest(username, "newUser001@test.com", "secret007");
+      var password = "newSecret007";
+      var registerRequest =
+          new RegisterRequest(username, "newUser001@test.com", password, password);
 
       assertAll(
           "CHECK TABLES DATA BEFORE REGISTER",
@@ -195,7 +201,8 @@ class RegisterUserTestIT {
       // given
       final var domainName = "test-domain";
       var username = "user001";
-      var registerRequest = new RegisterRequest(username, "user@test.com", "secret007");
+      var password = "newSecret007";
+      var registerRequest = new RegisterRequest(username, "user@test.com", password, password);
 
       assertAll(
           "CHECK TABLES DATA BEFORE REGISTER",
@@ -234,7 +241,8 @@ class RegisterUserTestIT {
       // given
       final var domainName = "test-domain";
       var username = "newUser007";
-      var registerRequest = new RegisterRequest(username, "user001@test.com", "secret007");
+      var password = "newSecret007";
+      var registerRequest = new RegisterRequest(username, "user001@test.com", password, password);
 
       assertAll(
           "CHECK TABLES DATA BEFORE REGISTER",
@@ -252,6 +260,213 @@ class RegisterUserTestIT {
               result -> {
                 Assertions.assertEquals(
                     HttpStatus.CONFLICT.value(), result.getResponse().getStatus());
+
+                assertAll(
+                    "CHECK TABLES DATA AFTER REGISTER",
+                    () ->
+                        Assertions.assertEquals(
+                            1, userRepositoryTest.countByDomainName(domainName)));
+              });
+
+    } catch (Exception e) {
+      Assertions.fail("ERROR: " + e.getMessage());
+    }
+  }
+
+  @Test
+  @Sql(scripts = "classpath:test/db/clean_all_data.sql")
+  @Sql(scripts = "classpath:test/db/data/auth/post_register.sql")
+  void shouldReturnErrorWhenLessThen8CharacterPasswords() {
+    try {
+      // given
+      final var domainName = "test-domain";
+      var username = "newUser007";
+      var password = "Secret7";
+      var registerRequest = new RegisterRequest(username, "user007@test.com", password, password);
+
+      assertAll(
+          "CHECK TABLES DATA BEFORE REGISTER",
+          () -> Assertions.assertEquals(1, userRepositoryTest.countByDomainName(domainName)));
+
+      // when
+      mockMvc
+          .perform(
+              MockMvcRequestBuilders.post(API_POST_REGISTER, domainName)
+                  .content(objectMapper.writeValueAsString(registerRequest))
+                  .contentType(MediaType.APPLICATION_JSON_VALUE))
+
+          // then
+          .andExpect(
+              result -> {
+                Assertions.assertEquals(
+                    HttpStatus.BAD_REQUEST.value(), result.getResponse().getStatus());
+                final var errorResponse =
+                    objectMapper.readValue(
+                        result.getResponse().getContentAsByteArray(), ErrorDetails.class);
+                Assertions.assertNotNull(errorResponse);
+                assertAll(
+                    "CHECK API RESPONSE",
+                    () ->
+                        Assertions.assertEquals(
+                            RestErrorCodeType.INPUT_VALIDATION.getErrorType(),
+                            errorResponse.code()));
+
+                assertAll(
+                    "CHECK TABLES DATA AFTER REGISTER",
+                    () ->
+                        Assertions.assertEquals(
+                            1, userRepositoryTest.countByDomainName(domainName)));
+              });
+
+    } catch (Exception e) {
+      Assertions.fail("ERROR: " + e.getMessage());
+    }
+  }
+
+  @Test
+  @Sql(scripts = "classpath:test/db/clean_all_data.sql")
+  @Sql(scripts = "classpath:test/db/data/auth/post_register.sql")
+  void shouldReturnErrorWhenMoreThen65CharacterPasswords() {
+    try {
+      // given
+      final var domainName = "test-domain";
+      var username = "newUser007";
+      var password =
+          "newSecret7"
+              + "newSecret7"
+              + "newSecret7"
+              + "newSecret7"
+              + "newSecret7"
+              + "newSecret7"
+              + "Secre";
+      var registerRequest = new RegisterRequest(username, "user007@test.com", password, password);
+
+      assertAll(
+          "CHECK TABLES DATA BEFORE REGISTER",
+          () -> Assertions.assertEquals(1, userRepositoryTest.countByDomainName(domainName)));
+
+      // when
+      mockMvc
+          .perform(
+              MockMvcRequestBuilders.post(API_POST_REGISTER, domainName)
+                  .content(objectMapper.writeValueAsString(registerRequest))
+                  .contentType(MediaType.APPLICATION_JSON_VALUE))
+
+          // then
+          .andExpect(
+              result -> {
+                Assertions.assertEquals(
+                    HttpStatus.BAD_REQUEST.value(), result.getResponse().getStatus());
+                final var errorResponse =
+                    objectMapper.readValue(
+                        result.getResponse().getContentAsByteArray(), ErrorDetails.class);
+                Assertions.assertNotNull(errorResponse);
+                assertAll(
+                    "CHECK API RESPONSE",
+                    () ->
+                        Assertions.assertEquals(
+                            RestErrorCodeType.INPUT_VALIDATION.getErrorType(),
+                            errorResponse.code()));
+
+                assertAll(
+                    "CHECK TABLES DATA AFTER REGISTER",
+                    () ->
+                        Assertions.assertEquals(
+                            1, userRepositoryTest.countByDomainName(domainName)));
+              });
+
+    } catch (Exception e) {
+      Assertions.fail("ERROR: " + e.getMessage());
+    }
+  }
+
+  @Test
+  @Sql(scripts = "classpath:test/db/clean_all_data.sql")
+  @Sql(scripts = "classpath:test/db/data/auth/post_register.sql")
+  void shouldReturnErrorWhenPasswordIsNotSameConfirmPassword() {
+    try {
+      // given
+      final var domainName = "test-domain";
+      var username = "newUser007";
+      var registerRequest =
+          new RegisterRequest(username, "user007@test.com", "secret007", "secret001");
+
+      assertAll(
+          "CHECK TABLES DATA BEFORE REGISTER",
+          () -> Assertions.assertEquals(1, userRepositoryTest.countByDomainName(domainName)));
+
+      // when
+      mockMvc
+          .perform(
+              MockMvcRequestBuilders.post(API_POST_REGISTER, domainName)
+                  .content(objectMapper.writeValueAsString(registerRequest))
+                  .contentType(MediaType.APPLICATION_JSON_VALUE))
+
+          // then
+          .andExpect(
+              result -> {
+                Assertions.assertEquals(
+                    HttpStatus.BAD_REQUEST.value(), result.getResponse().getStatus());
+                final var errorResponse =
+                    objectMapper.readValue(
+                        result.getResponse().getContentAsByteArray(), ErrorDetails.class);
+                Assertions.assertNotNull(errorResponse);
+                assertAll(
+                    "CHECK API RESPONSE",
+                    () ->
+                        Assertions.assertEquals(
+                            RestErrorCodeType.INPUT_VALIDATION.getErrorType(),
+                            errorResponse.code()));
+
+                assertAll(
+                    "CHECK TABLES DATA AFTER REGISTER",
+                    () ->
+                        Assertions.assertEquals(
+                            1, userRepositoryTest.countByDomainName(domainName)));
+              });
+
+    } catch (Exception e) {
+      Assertions.fail("ERROR: " + e.getMessage());
+    }
+  }
+
+  @Test
+  @Sql(scripts = "classpath:test/db/clean_all_data.sql")
+  @Sql(scripts = "classpath:test/db/data/auth/post_register.sql")
+  void shouldReturnErrorWhenPasswordIsCompromised() {
+    try {
+      // given
+      final var domainName = "test-domain";
+      var username = "newUser007";
+      var password = "password";
+      var registerRequest = new RegisterRequest(username, "user007@test.com", password, password);
+
+      assertAll(
+          "CHECK TABLES DATA BEFORE REGISTER",
+          () -> Assertions.assertEquals(1, userRepositoryTest.countByDomainName(domainName)));
+
+      // when
+      mockMvc
+          .perform(
+              MockMvcRequestBuilders.post(API_POST_REGISTER, domainName)
+                  .content(objectMapper.writeValueAsString(registerRequest))
+                  .contentType(MediaType.APPLICATION_JSON_VALUE))
+
+          // then
+          .andExpect(
+              result -> {
+                Assertions.assertEquals(
+                    HttpStatus.BAD_REQUEST.value(), result.getResponse().getStatus());
+                final var errorResponse =
+                    objectMapper.readValue(
+                        result.getResponse().getContentAsByteArray(), ErrorDetails.class);
+                Assertions.assertNotNull(errorResponse);
+                assertAll(
+                    "CHECK API RESPONSE",
+                    () ->
+                        Assertions.assertEquals(
+                            RestErrorCodeType.COMPROMISED_PASSWORD.getErrorType(),
+                            errorResponse.code()));
 
                 assertAll(
                     "CHECK TABLES DATA AFTER REGISTER",

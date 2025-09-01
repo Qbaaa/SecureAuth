@@ -1,5 +1,6 @@
 package com.qbaaa.secure.auth.user.api.controller;
 
+import com.qbaaa.secure.auth.shared.exception.InputInvalidException;
 import com.qbaaa.secure.auth.shared.util.UrlUtil;
 import com.qbaaa.secure.auth.user.api.dto.RegisterRequest;
 import com.qbaaa.secure.auth.user.usecase.ActiveAccountUseCase;
@@ -31,8 +32,11 @@ public class UserController {
       @PathVariable String domainName,
       @RequestBody @Valid RegisterRequest registerRequest,
       HttpServletRequest request) {
-    var baseUrl = UrlUtil.getBaseUrl(request);
+    if (!registerRequest.password().equals(registerRequest.confirmPassword())) {
+      throw new InputInvalidException("Passwords don't match");
+    }
 
+    var baseUrl = UrlUtil.getBaseUrl(request);
     return ResponseEntity.ok(registerAccountUseCase.register(baseUrl, domainName, registerRequest));
   }
 
@@ -40,7 +44,6 @@ public class UserController {
   public ResponseEntity<String> activeAccount(
       @PathVariable String domainName, @RequestParam String token, HttpServletRequest request) {
     var baseUrl = UrlUtil.getBaseUrl(request);
-
     activeAccountUseCase.activeAccount(baseUrl, domainName, token);
     return ResponseEntity.ok("Account activated");
   }
