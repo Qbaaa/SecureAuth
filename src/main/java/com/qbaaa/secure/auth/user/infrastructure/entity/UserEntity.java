@@ -18,8 +18,10 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -47,6 +49,11 @@ public class UserEntity extends AuditDataEntity {
 
   private Boolean isActive;
 
+  @Column(nullable = false)
+  private Integer failedLoginAttempts;
+
+  private LocalDateTime lastFailedLoginTime;
+
   @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
   private PasswordEntity password;
 
@@ -70,6 +77,10 @@ public class UserEntity extends AuditDataEntity {
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "role_id"))
   private List<RoleEntity> roles;
+
+  public Optional<LocalDateTime> getLastFailedLoginTime() {
+    return Optional.ofNullable(lastFailedLoginTime);
+  }
 
   @Override
   public boolean equals(Object o) {

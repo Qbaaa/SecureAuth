@@ -1,5 +1,6 @@
 package com.qbaaa.secure.auth.shared.exception.rest;
 
+import com.qbaaa.secure.auth.shared.exception.AccountLockedException;
 import com.qbaaa.secure.auth.shared.exception.DomainExistsException;
 import com.qbaaa.secure.auth.shared.exception.EmailAlreadyExistsException;
 import com.qbaaa.secure.auth.shared.exception.InputInvalidException;
@@ -166,6 +167,15 @@ public class RestResponseEntityExceptionHandler {
   ResponseEntity<ErrorDetails> handleCompromisedPasswordException(
       CompromisedPasswordException ex, HttpServletRequest request) {
     var errorCodeType = RestErrorCodeType.COMPROMISED_PASSWORD;
+    var errorDetails = buildErrorDetails(errorCodeType.getErrorType(), ex.getMessage());
+    log.error(SERVER_ERROR_LOG, errorDetails.uuid(), request.getRequestURI(), ex);
+    return ResponseEntity.status(errorCodeType.getHttpStatus()).body(errorDetails);
+  }
+
+  @ExceptionHandler(AccountLockedException.class)
+  ResponseEntity<ErrorDetails> handleAccountLockedException(
+      AccountLockedException ex, HttpServletRequest request) {
+    var errorCodeType = RestErrorCodeType.ACCOUNT_LOCKED;
     var errorDetails = buildErrorDetails(errorCodeType.getErrorType(), ex.getMessage());
     log.error(SERVER_ERROR_LOG, errorDetails.uuid(), request.getRequestURI(), ex);
     return ResponseEntity.status(errorCodeType.getHttpStatus()).body(errorDetails);

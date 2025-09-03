@@ -70,5 +70,12 @@ secureauth:
       emailTokenCleanup: 0 0 1 * * *
       sessionCleanup: 0 0 3 * * *
 
+  lock:
+    account:
+      login:
+        attempt: 3
+        time: 1 # minutes
+
+
 shedlock:
   enabled: true

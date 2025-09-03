@@ -13,19 +13,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoggerAspect {
 
-  @Pointcut("execution(* com.qbaaa.secure.auth.controller.*.*(..))")
+  @Pointcut("execution(* com.qbaaa.secure.auth..api.controller.*.*(..))")
   public void controllerPackagePointcut() {}
 
-  @Pointcut("execution(* com.qbaaa.secure.auth.service..*.*(..))")
+  @Pointcut("execution(* com.qbaaa.secure.auth..domain.service..*.*(..))")
   public void servicePackagePointcut() {}
 
-  @Pointcut("execution(* com.qbaaa.secure.auth.repository.*.*(..))")
+  @Pointcut("execution(* com.qbaaa.secure..infrastructure.repository.*.*(..))")
   public void repositoryPackagePointcut() {}
 
-  @Pointcut("execution(* com.qbaaa.secure.auth.job.*.*(..))")
+  @Pointcut("execution(* com.qbaaa.secure.auth..job..*.*(..))")
   public void jobMethodPointcut() {}
 
-  @Pointcut("execution(* com.qbaaa.secure.auth.event.*.*(..))")
+  @Pointcut("execution(* com.qbaaa.secure.auth..event..*.*(..))")
   public void eventMethodPointcut() {}
 
   @Around("jobMethodPointcut()")

@@ -90,6 +90,8 @@ class RegisterUserTestIT {
                           userRepositoryTest.findByDomainNameAndUsername(domainName, username);
                       Assertions.assertTrue(addingUser.isPresent());
                       Assertions.assertTrue(addingUser.get().getIsActive());
+                      Assertions.assertEquals(0, addingUser.get().getFailedLoginAttempts());
+                      Assertions.assertTrue(addingUser.get().getLastFailedLoginTime().isEmpty());
                       Assertions.assertEquals(2, addingUser.get().getRoles().size());
                       Assertions.assertNotNull(addingUser.get().getPassword());
                     });
@@ -142,6 +144,8 @@ class RegisterUserTestIT {
                           userRepositoryTest.findByDomainNameAndUsername(domainName, username);
                       Assertions.assertTrue(addingUser.isPresent());
                       Assertions.assertFalse(addingUser.get().getIsActive());
+                      Assertions.assertEquals(0, addingUser.get().getFailedLoginAttempts());
+                      Assertions.assertTrue(addingUser.get().getLastFailedLoginTime().isEmpty());
                       Assertions.assertEquals(1, addingUser.get().getRoles().size());
                       Assertions.assertNotNull(addingUser.get().getPassword());
                     });

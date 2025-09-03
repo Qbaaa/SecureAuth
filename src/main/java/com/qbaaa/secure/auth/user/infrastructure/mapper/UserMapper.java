@@ -20,6 +20,8 @@ public interface UserMapper {
   @Mapping(target = "sessions", ignore = true)
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "updatedAt", ignore = true)
+  @Mapping(target = "failedLoginAttempts", constant = "0")
+  @Mapping(target = "lastFailedLoginTime", ignore = true)
   @Mapping(target = "domain", source = "domain")
   @Mapping(target = "roles", source = "roles")
   UserEntity mapUserEntity(
@@ -32,6 +34,8 @@ public interface UserMapper {
   @Mapping(target = "sessions", ignore = true)
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "updatedAt", ignore = true)
+  @Mapping(target = "failedLoginAttempts", constant = "0")
+  @Mapping(target = "lastFailedLoginTime", ignore = true)
   @Mapping(target = "isActive", expression = "java(!domain.getIsEnabledVerifiedEmail())")
   @Mapping(target = "domain", source = "domain")
   @Mapping(target = "roles", source = "roles")

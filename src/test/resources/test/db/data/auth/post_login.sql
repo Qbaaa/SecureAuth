@@ -4,13 +4,22 @@ VALUES (100, 'test-domain', 300, 600, 180, 3600,
         '2025-03-25 22:15:00', '2025-03-25 22:15:00')
 ;
 
-INSERT INTO secureauth."user" (id, domain_id, username, email, is_active, created_at, updated_at)
+INSERT INTO secureauth."user" (id, domain_id, username, email, is_active, created_at, updated_at,
+                               failed_login_attempts, last_failed_login_time)
 VALUES (101, 100, 'user001', 'user001@test.com', true,
-        '2025-03-25 22:30:00', '2025-03-25 22:30:00')
+        '2025-03-25 22:30:00', '2025-03-25 22:30:00', 0, null)
      , (102, 100, 'user002', 'user002@test.com', true,
-        '2025-03-25 22:35:00', '2025-03-25 22:35:00')
+        '2025-03-25 22:35:00', '2025-03-25 22:35:00', 0, null)
      , (103, 100, 'user003NoActive', 'user003@test.com', false,
-        '2025-05-29 22:35:00', '2025-05-29 22:35:00');
+        '2025-05-29 22:35:00', '2025-05-29 22:35:00',0, null)
+     , (104, 100, 'user004', 'user004@test.com', true,
+        '2025-03-27 22:35:00', '2025-03-28 22:35:00', 0, null)
+     , (105, 100, 'userLockAccount', 'user005@test.com', true,
+        '2025-03-27 22:35:00', '2025-03-28 22:35:00', 3, CURRENT_TIMESTAMP)
+     , (106, 100, 'userLockClean', 'user006@test.com', true,
+        '2025-03-27 22:35:00', '2025-03-28 22:35:00', 2, CURRENT_TIMESTAMP)
+     , (107, 100, 'userLockIncrease', 'user007@test.com', true,
+        '2025-03-27 22:35:00', '2025-03-28 22:35:00', 2, CURRENT_TIMESTAMP)
 ;
 
 INSERT INTO secureauth."password" (id, user_id, "password", created_at, updated_at)
@@ -20,6 +29,14 @@ VALUES (1, 101, '$2a$10$Di3k1j1pr9LaAPvQi2y5XekxS0SB1ZxSp.rMSP129deGSqDQamf12', 
         '2025-03-25 22:35:00', '2025-03-25 22:35:00')
      , (3, 103, '$2a$10$TgEGBiMGxkskCAKA280xJ.GYXDR.CdfN2vY5qU9Shti.u8HKK3KmW', -- secretUser003
         '2025-05-29 22:35:00', '2025-05-29 22:35:00')
+     , (4, 104, '$2a$10$DmZD6S035DEW3nsbJYb3zOdnHWohNzL8bq60auttuwQu/X36pdLky', -- secretUser002
+        '2025-03-27 22:35:00', '2025-03-27 22:35:00')
+     , (5, 105, '$2a$10$DmZD6S035DEW3nsbJYb3zOdnHWohNzL8bq60auttuwQu/X36pdLky', -- secretUser002
+        '2025-03-27 22:35:00', '2025-03-27 22:35:00')
+     , (6, 106, '$2a$10$DmZD6S035DEW3nsbJYb3zOdnHWohNzL8bq60auttuwQu/X36pdLky', -- secretUser002
+        '2025-03-27 22:35:00', '2025-03-27 22:35:00')
+     , (7, 107, '$2a$10$DmZD6S035DEW3nsbJYb3zOdnHWohNzL8bq60auttuwQu/X36pdLky', -- secretUser002
+        '2025-03-27 22:35:00', '2025-03-27 22:35:00')
 ;
 
 INSERT INTO secureauth."role" (id, domain_id, "name", description, created_at, updated_at)

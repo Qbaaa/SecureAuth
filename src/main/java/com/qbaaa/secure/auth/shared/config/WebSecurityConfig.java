@@ -1,14 +1,20 @@
 package com.qbaaa.secure.auth.shared.config;
 
+import com.qbaaa.secure.auth.shared.config.security.UsernamePasswordAuthProvider;
 import com.qbaaa.secure.auth.shared.config.security.jwt.CustomJwtAuthenticationFilter;
 import com.qbaaa.secure.auth.shared.config.security.jwt.CustomJwtAuthenticationProvider;
 import com.qbaaa.secure.auth.shared.config.security.jwt.CustomJwtConverter;
 import com.qbaaa.secure.auth.shared.config.security.jwt.JwtService;
 import com.qbaaa.secure.auth.shared.config.security.jwt.Role;
+import com.qbaaa.secure.auth.user.domain.service.PasswordService;
+import com.qbaaa.secure.auth.user.domain.service.UserService;
 import java.util.List;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -55,6 +61,7 @@ public class WebSecurityConfig {
   @Bean
   SecurityFilterChain securityFilterChain(
       HttpSecurity http, CustomJwtAuthenticationFilter customJwtAuthenticationFilter)
+      // CustomLoginAuthenticationFilter customLoginFilter)
       throws Exception {
     return http.authorizeHttpRequests(
             authorize ->
@@ -76,14 +83,41 @@ public class WebSecurityConfig {
         .cors(config -> config.configurationSource(request -> corsConfiguration()))
         // .cors(AbstractHttpConfigurer::disable)
         .addFilterBefore(customJwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        // .addFilterAt(customLoginFilter, UsernamePasswordAuthenticationFilter.class)
         .build();
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(JwtService jwtService) {
-    var jwtAuthenticationProvider =
-        new CustomJwtAuthenticationProvider(jwtService, new CustomJwtConverter());
+  public AuthenticationProvider customJwtAuthenticationProvider(JwtService jwtService) {
+    return new CustomJwtAuthenticationProvider(jwtService, new CustomJwtConverter());
+  }
 
-    return new ProviderManager(List.of(jwtAuthenticationProvider));
+  @Bean
+  public AuthenticationProvider customUsernamePasswordAuthProvider(
+      UserService userService,
+      PasswordService passwordService,
+      CompromisedPasswordChecker compromisedPasswordChecker) {
+    return new UsernamePasswordAuthProvider(
+        userService, passwordService, compromisedPasswordChecker);
+  }
+
+  @Bean
+  public DefaultAuthenticationEventPublisher authenticationEventPublisher(
+      ApplicationEventPublisher applicationEventPublisher) {
+    return new DefaultAuthenticationEventPublisher(applicationEventPublisher);
+  }
+
+  @Bean
+  public AuthenticationManager authenticationManager(
+      AuthenticationProvider customJwtAuthenticationProvider,
+      AuthenticationProvider customUsernamePasswordAuthProvider,
+      DefaultAuthenticationEventPublisher authenticationEventPublisher) {
+
+    ProviderManager authManager =
+        new ProviderManager(
+            List.of(customJwtAuthenticationProvider, customUsernamePasswordAuthProvider));
+
+    authManager.setAuthenticationEventPublisher(authenticationEventPublisher);
+    return authManager;
   }
 }

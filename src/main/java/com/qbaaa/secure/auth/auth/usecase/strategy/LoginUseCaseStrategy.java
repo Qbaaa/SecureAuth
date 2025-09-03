@@ -8,40 +8,40 @@ import com.qbaaa.secure.auth.auth.domian.service.SessionService;
 import com.qbaaa.secure.auth.auth.infrastructure.dto.ClaimJwtDto;
 import com.qbaaa.secure.auth.domain.domian.service.DomainService;
 import com.qbaaa.secure.auth.domain.infrastructure.projection.DomainConfigValidityProjection;
+import com.qbaaa.secure.auth.shared.config.security.CustomUsernamePasswordAuthenticationToken;
 import com.qbaaa.secure.auth.shared.config.security.jwt.JwtService;
-import com.qbaaa.secure.auth.shared.exception.LoginException;
 import com.qbaaa.secure.auth.shared.exception.UserNoActiveAccount;
-import com.qbaaa.secure.auth.user.domain.service.PasswordService;
-import com.qbaaa.secure.auth.user.domain.service.UserService;
 import com.qbaaa.secure.auth.user.infrastructure.entity.RoleEntity;
 import com.qbaaa.secure.auth.user.infrastructure.entity.UserEntity;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
-import org.springframework.security.authentication.password.CompromisedPasswordChecker;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service("password")
 @RequiredArgsConstructor
-@Slf4j
 public class LoginUseCaseStrategy extends AuthStrategy {
 
+  private final AuthenticationManager authenticationManager;
   private final DomainService domainService;
-  private final UserService userService;
-  private final PasswordService passwordService;
   private final SessionService sessionService;
   private final RefreshTokenService refreshTokenService;
   private final JwtService jwtService;
-  private final CompromisedPasswordChecker compromisedPasswordChecker;
 
   @Transactional
   public TokenResponse authenticate(String domainName, String baseUrl, AuthRequest request) {
     var login = (LoginRequest) request;
-    var user = authenticateUser(domainName, login);
+
+    Authentication authentication =
+        authenticationManager.authenticate(
+            CustomUsernamePasswordAuthenticationToken.unauthenticated(
+                domainName, login.getUsername(), login.getPassword()));
+
+    var user = (UserEntity) authentication.getPrincipal();
     validateUserIsActive(domainName, user);
-    validatePassword(login.getPassword());
 
     final var configDomain = getDomainConfig(domainName);
     final var session = sessionService.createSession(user, configDomain.getSessionValidity());
@@ -55,19 +55,6 @@ public class LoginUseCaseStrategy extends AuthStrategy {
         user, configDomain.getRefreshTokenValidity(), refreshToken);
 
     return new TokenResponse(accessToken, refreshToken);
-  }
-
-  private UserEntity authenticateUser(String domainName, LoginRequest login) {
-    var userOpt = userService.findUserInDomain(domainName, login.getUsername());
-    if (userOpt.isEmpty()) {
-      throw new LoginException("Bad username or password");
-    }
-
-    var user = userOpt.get();
-    if (!passwordService.validatePassword(user, login.getPassword())) {
-      throw new LoginException("Bad username or password");
-    }
-    return user;
   }
 
   private void validateUserIsActive(String domainName, UserEntity user) {
@@ -103,12 +90,5 @@ public class LoginUseCaseStrategy extends AuthStrategy {
       String baseUrl, String domainName, UUID sessionId, DomainConfigValidityProjection config) {
     return jwtService.createRefreshToken(
         baseUrl, domainName, sessionId.toString(), config.getRefreshTokenValidity());
-  }
-
-  private void validatePassword(final String password) {
-    if (!password.isBlank() && compromisedPasswordChecker.check(password).isCompromised()) {
-      log.warn(
-          "The password unsafe because it's well-known to hackers. You must change your password.");
-    }
   }
 }
