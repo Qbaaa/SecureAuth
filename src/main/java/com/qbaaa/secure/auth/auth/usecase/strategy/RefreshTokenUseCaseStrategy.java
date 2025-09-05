@@ -9,7 +9,7 @@ import com.qbaaa.secure.auth.auth.domian.service.SessionService;
 import com.qbaaa.secure.auth.auth.infrastructure.dto.ClaimJwtDto;
 import com.qbaaa.secure.auth.domain.domian.service.DomainService;
 import com.qbaaa.secure.auth.domain.infrastructure.projection.DomainConfigValidityProjection;
-import com.qbaaa.secure.auth.shared.config.security.jwt.JwtService;
+import com.qbaaa.secure.auth.shared.security.jwt.JwtService;
 import com.qbaaa.secure.auth.shared.util.IssuerUtils;
 import com.qbaaa.secure.auth.user.domain.service.UserService;
 import com.qbaaa.secure.auth.user.infrastructure.entity.RoleEntity;

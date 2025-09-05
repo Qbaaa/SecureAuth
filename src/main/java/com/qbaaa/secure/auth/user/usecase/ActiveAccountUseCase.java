@@ -1,7 +1,7 @@
 package com.qbaaa.secure.auth.user.usecase;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.qbaaa.secure.auth.shared.config.security.jwt.JwtService;
+import com.qbaaa.secure.auth.shared.security.jwt.JwtService;
 import com.qbaaa.secure.auth.shared.util.IssuerUtils;
 import com.qbaaa.secure.auth.user.domain.service.EmailTokenService;
 import com.qbaaa.secure.auth.user.domain.service.UserService;

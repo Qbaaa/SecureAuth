@@ -2,7 +2,6 @@ package com.qbaaa.secure.auth.auth.api.controller;
 
 import com.qbaaa.secure.auth.auth.api.dto.AuthRequest;
 import com.qbaaa.secure.auth.auth.api.dto.RefreshTokenRequest;
-import com.qbaaa.secure.auth.auth.api.dto.TokenResponse;
 import com.qbaaa.secure.auth.auth.usecase.LogoutUseCase;
 import com.qbaaa.secure.auth.auth.usecase.strategy.AuthStrategy;
 import com.qbaaa.secure.auth.shared.util.UrlUtil;
@@ -27,7 +26,7 @@ public class AuthController {
   private final LogoutUseCase logoutUseCase;
 
   @PostMapping("token")
-  public ResponseEntity<TokenResponse> token(
+  public ResponseEntity<?> token(
       @PathVariable String domainName,
       @RequestBody AuthRequest authRequest,
       HttpServletRequest request) {

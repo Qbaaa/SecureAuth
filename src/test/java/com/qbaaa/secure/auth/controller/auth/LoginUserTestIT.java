@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qbaaa.secure.auth.auth.api.dto.LoginRequest;
+import com.qbaaa.secure.auth.auth.api.dto.MfaResponse;
 import com.qbaaa.secure.auth.auth.api.dto.TokenResponse;
 import com.qbaaa.secure.auth.config.ContainerConfiguration;
 import com.qbaaa.secure.auth.config.time.FakeTimeProvider;
@@ -14,6 +15,7 @@ import com.qbaaa.secure.auth.repository.SessionRepositoryTest;
 import com.qbaaa.secure.auth.repository.UserRepositoryTest;
 import com.qbaaa.secure.auth.shared.exception.RestErrorCodeType;
 import com.qbaaa.secure.auth.shared.exception.rest.ErrorDetails;
+import com.qbaaa.secure.auth.user.domain.enums.OperationType;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.stream.Stream;
@@ -438,7 +440,7 @@ class LoginUserTestIT {
                       var user =
                           userRepositoryTest.findByDomainNameAndUsername(domainName, username);
                       Assertions.assertTrue(user.isPresent());
-                      Assertions.assertEquals(3, user.get().getFailedLoginAttempts());
+                      Assertions.assertEquals(4, user.get().getFailedLoginAttempts());
                       Assertions.assertFalse(user.get().getLastFailedLoginTime().isEmpty());
                     });
               });
@@ -474,7 +476,7 @@ class LoginUserTestIT {
           .andExpect(
               result -> {
                 Assertions.assertEquals(
-                    HttpStatus.UNAUTHORIZED.value(), result.getResponse().getStatus());
+                    HttpStatus.LOCKED.value(), result.getResponse().getStatus());
                 final var response =
                     objectMapper.readValue(
                         result.getResponse().getContentAsByteArray(), ErrorDetails.class);
@@ -483,7 +485,7 @@ class LoginUserTestIT {
                     "CHECK API RESPONSE",
                     () ->
                         Assertions.assertEquals(
-                            RestErrorCodeType.CREDENTIALS_INVALIDATION.name(), response.code()));
+                            RestErrorCodeType.ACCOUNT_LOCKED.name(), response.code()));
 
                 assertAll(
                     "CHECK TABLES DATA AFTER LOGIN TO APP",
@@ -498,6 +500,67 @@ class LoginUserTestIT {
                       Assertions.assertTrue(user.isPresent());
                       Assertions.assertEquals(3, user.get().getFailedLoginAttempts());
                       Assertions.assertFalse(user.get().getLastFailedLoginTime().isEmpty());
+                    });
+              });
+
+    } catch (Exception e) {
+      Assertions.fail("ERROR: " + e.getMessage());
+    }
+  }
+
+  @Test
+  @Sql(scripts = "classpath:test/db/clean_all_data.sql")
+  @Sql(scripts = "classpath:test/db/data/auth/post_login.sql")
+  void shouldReturnPendingMfaWhenMfaEnabledWithCorrectPassword() {
+    try {
+      // given
+      final var domainName = "test-domain";
+      final var username = "userMfa";
+      final var password = "secretUser002";
+      final var loginRequest = new LoginRequest(username, password);
+
+      assertAll(
+          "CHECK TABLES DATA BEFORE LOGIN TO APP",
+          () -> Assertions.assertEquals(0, sessionRepositoryTest.countByUsername(username)),
+          () -> Assertions.assertEquals(0, refreshTokenRepositoryTest.countByUsername(username)));
+
+      // when
+      mockMvc
+          .perform(
+              MockMvcRequestBuilders.post(API_POST_LOGIN, domainName)
+                  .content(objectMapper.writeValueAsString(loginRequest))
+                  .contentType(MediaType.APPLICATION_JSON_VALUE))
+          // then
+          .andExpect(
+              result -> {
+                Assertions.assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
+                final var response =
+                    objectMapper.readValue(
+                        result.getResponse().getContentAsByteArray(), MfaResponse.class);
+                Assertions.assertNotNull(response);
+                assertAll(
+                    "CHECK API RESPONSE",
+                    () ->
+                        Assertions.assertNotNull(
+                            response.pendingToken(), "Pending token should not be null"),
+                    () -> Assertions.assertEquals("MFA_REQUIRED", response.status()));
+
+                assertAll(
+                    "CHECK TABLES DATA AFTER LOGIN TO APP",
+                    () ->
+                        Assertions.assertEquals(0, sessionRepositoryTest.countByUsername(username)),
+                    () ->
+                        Assertions.assertEquals(
+                            0, refreshTokenRepositoryTest.countByUsername(username)),
+                    () -> {
+                      var user =
+                          userRepositoryTest.findByDomainNameAndUsername(domainName, username);
+                      Assertions.assertTrue(user.isPresent());
+                      Assertions.assertEquals(2, user.get().getFailedLoginAttempts());
+                      Assertions.assertTrue(user.get().getLastFailedLoginTime().isPresent());
+                      var opt = user.get().getOtp();
+                      Assertions.assertTrue(opt.isPresent());
+                      Assertions.assertEquals(OperationType.MFA, opt.get().getOperationType());
                     });
               });
 

@@ -2,9 +2,9 @@ package com.qbaaa.secure.auth.user.usecase;
 
 import com.qbaaa.secure.auth.domain.domian.service.DomainService;
 import com.qbaaa.secure.auth.domain.infrastructure.entity.DomainEntity;
-import com.qbaaa.secure.auth.shared.config.security.jwt.JwtService;
 import com.qbaaa.secure.auth.shared.event.AccountActiveEvent;
 import com.qbaaa.secure.auth.shared.exception.RegisterException;
+import com.qbaaa.secure.auth.shared.security.jwt.JwtService;
 import com.qbaaa.secure.auth.user.api.dto.RegisterRequest;
 import com.qbaaa.secure.auth.user.domain.service.EmailTokenService;
 import com.qbaaa.secure.auth.user.domain.service.UserService;

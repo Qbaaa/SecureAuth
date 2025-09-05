@@ -1,4 +1,4 @@
-package com.qbaaa.secure.auth.shared.config.http.client;
+package com.qbaaa.secure.auth.shared.config;
 
 import java.net.http.HttpClient;
 import java.time.Duration;

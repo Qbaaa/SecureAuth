@@ -69,6 +69,11 @@ secureauth:
       refreshTokenCleanup: 0 0 2 * * *
       emailTokenCleanup: 0 0 1 * * *
       sessionCleanup: 0 0 3 * * *
+  mfa:
+    login:
+      mail:
+        sender: notification@test.com
+        template: mfa.ftl
 
   lock:
     account:

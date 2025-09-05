@@ -79,67 +79,70 @@ class RefreshTokenTestIT {
       final var domainName = "test-domain";
       var username = "user002";
       var loginRequest = new LoginRequest(username, "secretUser002");
-      var token = loginUseCaseStrategy.authenticate(domainName, "http://localhost", loginRequest);
+      var auth = loginUseCaseStrategy.authenticate(domainName, "http://localhost", loginRequest);
 
       assertAll(
           "CHECK TABLES DATA BEFORE REFRESH TOKEN",
           () -> Assertions.assertEquals(1, refreshTokenRepositoryTest.countByUsername(username)),
           () -> Assertions.assertEquals(1, sessionRepositoryTest.countByUsername(username)));
 
-      var refreshTokenOldRequest = new RefreshTokenRequest(token.refreshToken());
+      if (auth instanceof TokenResponse token) {
+        var refreshTokenOldRequest = new RefreshTokenRequest(token.refreshToken());
 
-      // when
-      mockMvc
-          .perform(
-              MockMvcRequestBuilders.post(API_POST_REFRESH_TOKEN, domainName)
-                  .content(objectMapper.writeValueAsString(refreshTokenOldRequest))
-                  .contentType(MediaType.APPLICATION_JSON_VALUE))
+        // when
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.post(API_POST_REFRESH_TOKEN, domainName)
+                    .content(objectMapper.writeValueAsString(refreshTokenOldRequest))
+                    .contentType(MediaType.APPLICATION_JSON_VALUE))
 
-          // then
-          .andExpect(
-              result -> {
-                Assertions.assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
-                final var tokenResponse =
-                    objectMapper.readValue(
-                        result.getResponse().getContentAsByteArray(), TokenResponse.class);
-                Assertions.assertNotNull(tokenResponse);
-                assertAll(
-                    "CHECK API RESPONSE",
-                    () ->
-                        Assertions.assertNotNull(
-                            tokenResponse.accessToken(), "Access token should not be null"),
-                    () ->
-                        Assertions.assertFalse(
-                            tokenResponse.accessToken().isEmpty(),
-                            "Access token should not be empty"),
-                    () ->
-                        Assertions.assertFalse(
-                            tokenResponse.accessToken().isEmpty(),
-                            "Access token should have a size greater than 0"),
-                    () ->
-                        Assertions.assertNotNull(
-                            tokenResponse.refreshToken(), "Refresh token should not be null"),
-                    () ->
-                        Assertions.assertFalse(
-                            tokenResponse.refreshToken().isEmpty(),
-                            "Refresh token should not be empty"),
-                    () ->
-                        Assertions.assertFalse(
-                            tokenResponse.refreshToken().isEmpty(),
-                            "Refresh token should have a size greater than 0"));
+            // then
+            .andExpect(
+                result -> {
+                  Assertions.assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
+                  final var tokenResponse =
+                      objectMapper.readValue(
+                          result.getResponse().getContentAsByteArray(), TokenResponse.class);
+                  Assertions.assertNotNull(tokenResponse);
+                  assertAll(
+                      "CHECK API RESPONSE",
+                      () ->
+                          Assertions.assertNotNull(
+                              tokenResponse.accessToken(), "Access token should not be null"),
+                      () ->
+                          Assertions.assertFalse(
+                              tokenResponse.accessToken().isEmpty(),
+                              "Access token should not be empty"),
+                      () ->
+                          Assertions.assertFalse(
+                              tokenResponse.accessToken().isEmpty(),
+                              "Access token should have a size greater than 0"),
+                      () ->
+                          Assertions.assertNotNull(
+                              tokenResponse.refreshToken(), "Refresh token should not be null"),
+                      () ->
+                          Assertions.assertFalse(
+                              tokenResponse.refreshToken().isEmpty(),
+                              "Refresh token should not be empty"),
+                      () ->
+                          Assertions.assertFalse(
+                              tokenResponse.refreshToken().isEmpty(),
+                              "Refresh token should have a size greater than 0"));
 
-                assertAll(
-                    "CHECK TABLES DATA AFTER REFRESH TOKEN",
-                    () ->
-                        Assertions.assertEquals(1, sessionRepositoryTest.countByUsername(username)),
-                    () ->
-                        Assertions.assertEquals(
-                            1, refreshTokenRepositoryTest.countByUsername(username)),
-                    () ->
-                        Assertions.assertTrue(
-                            refreshTokenRepositoryTest.existsByToken(
-                                tokenResponse.refreshToken())));
-              });
+                  assertAll(
+                      "CHECK TABLES DATA AFTER REFRESH TOKEN",
+                      () ->
+                          Assertions.assertEquals(
+                              1, sessionRepositoryTest.countByUsername(username)),
+                      () ->
+                          Assertions.assertEquals(
+                              1, refreshTokenRepositoryTest.countByUsername(username)),
+                      () ->
+                          Assertions.assertTrue(
+                              refreshTokenRepositoryTest.existsByToken(
+                                  tokenResponse.refreshToken())));
+                });
+      }
 
     } catch (Exception e) {
       Assertions.fail("ERROR: " + e.getMessage());
@@ -157,37 +160,39 @@ class RefreshTokenTestIT {
       final var domainName = "test-domain";
       var username = "user002";
       var loginRequest = new LoginRequest(username, "secretUser002");
-      var token = loginUseCaseStrategy.authenticate(domainName, "http://localhost", loginRequest);
+      var auth = loginUseCaseStrategy.authenticate(domainName, "http://localhost", loginRequest);
 
       assertAll(
           "CHECK TABLES DATA BEFORE REFRESH TOKEN",
           () -> Assertions.assertEquals(1, refreshTokenRepositoryTest.countByUsername(username)),
           () -> Assertions.assertEquals(1, sessionRepositoryTest.countByUsername(username)));
 
-      var refreshTokenOldRequest = new RefreshTokenRequest(token.refreshToken());
+      if (auth instanceof TokenResponse token) {
+        var refreshTokenOldRequest = new RefreshTokenRequest(token.refreshToken());
 
-      // when
-      mockMvc
-          .perform(
-              MockMvcRequestBuilders.post(API_POST_REFRESH_TOKEN, domainName)
-                  .content(objectMapper.writeValueAsString(refreshTokenOldRequest))
-                  .contentType(MediaType.APPLICATION_JSON_VALUE))
+        // when
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.post(API_POST_REFRESH_TOKEN, domainName)
+                    .content(objectMapper.writeValueAsString(refreshTokenOldRequest))
+                    .contentType(MediaType.APPLICATION_JSON_VALUE))
 
-          // then
-          .andExpect(
-              result -> {
-                Assertions.assertEquals(
-                    HttpStatus.UNAUTHORIZED.value(), result.getResponse().getStatus());
-                final var errorResponse =
-                    objectMapper.readValue(
-                        result.getResponse().getContentAsByteArray(), ErrorDetails.class);
-                Assertions.assertNotNull(errorResponse);
-              });
+            // then
+            .andExpect(
+                result -> {
+                  Assertions.assertEquals(
+                      HttpStatus.UNAUTHORIZED.value(), result.getResponse().getStatus());
+                  final var errorResponse =
+                      objectMapper.readValue(
+                          result.getResponse().getContentAsByteArray(), ErrorDetails.class);
+                  Assertions.assertNotNull(errorResponse);
+                });
 
-      assertAll(
-          "CHECK TABLES DATA AFTER REFRESH TOKEN",
-          () -> Assertions.assertEquals(1, sessionRepositoryTest.countByUsername(username)),
-          () -> Assertions.assertEquals(1, refreshTokenRepositoryTest.countByUsername(username)));
+        assertAll(
+            "CHECK TABLES DATA AFTER REFRESH TOKEN",
+            () -> Assertions.assertEquals(1, sessionRepositoryTest.countByUsername(username)),
+            () -> Assertions.assertEquals(1, refreshTokenRepositoryTest.countByUsername(username)));
+      }
 
     } catch (Exception e) {
       Assertions.fail("ERROR: " + e.getMessage());
@@ -205,37 +210,39 @@ class RefreshTokenTestIT {
       final var domainName = "test-domain";
       var username = "user002";
       var loginRequest = new LoginRequest(username, "secretUser002");
-      var token = loginUseCaseStrategy.authenticate(domainName, "http://localhost", loginRequest);
+      var auth = loginUseCaseStrategy.authenticate(domainName, "http://localhost", loginRequest);
 
       assertAll(
           "CHECK TABLES DATA BEFORE REFRESH TOKEN",
           () -> Assertions.assertEquals(1, refreshTokenRepositoryTest.countByUsername(username)),
           () -> Assertions.assertEquals(1, sessionRepositoryTest.countByUsername(username)));
 
-      var refreshTokenOldRequest = new RefreshTokenRequest(token.refreshToken());
+      if (auth instanceof TokenResponse token) {
+        var refreshTokenOldRequest = new RefreshTokenRequest(token.refreshToken());
 
-      // when
-      mockMvc
-          .perform(
-              MockMvcRequestBuilders.post(API_POST_REFRESH_TOKEN, domainName)
-                  .content(objectMapper.writeValueAsString(refreshTokenOldRequest))
-                  .contentType(MediaType.APPLICATION_JSON_VALUE))
+        // when
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.post(API_POST_REFRESH_TOKEN, domainName)
+                    .content(objectMapper.writeValueAsString(refreshTokenOldRequest))
+                    .contentType(MediaType.APPLICATION_JSON_VALUE))
 
-          // then
-          .andExpect(
-              result -> {
-                Assertions.assertEquals(
-                    HttpStatus.UNAUTHORIZED.value(), result.getResponse().getStatus());
-                final var errorResponse =
-                    objectMapper.readValue(
-                        result.getResponse().getContentAsByteArray(), ErrorDetails.class);
-                Assertions.assertNotNull(errorResponse);
-              });
+            // then
+            .andExpect(
+                result -> {
+                  Assertions.assertEquals(
+                      HttpStatus.UNAUTHORIZED.value(), result.getResponse().getStatus());
+                  final var errorResponse =
+                      objectMapper.readValue(
+                          result.getResponse().getContentAsByteArray(), ErrorDetails.class);
+                  Assertions.assertNotNull(errorResponse);
+                });
 
-      assertAll(
-          "CHECK TABLES DATA AFTER REFRESH TOKEN",
-          () -> Assertions.assertEquals(1, refreshTokenRepositoryTest.countByUsername(username)),
-          () -> Assertions.assertEquals(0, sessionRepositoryTest.countByUsername(username)));
+        assertAll(
+            "CHECK TABLES DATA AFTER REFRESH TOKEN",
+            () -> Assertions.assertEquals(1, refreshTokenRepositoryTest.countByUsername(username)),
+            () -> Assertions.assertEquals(0, sessionRepositoryTest.countByUsername(username)));
+      }
 
     } catch (Exception e) {
       Assertions.fail("ERROR: " + e.getMessage());

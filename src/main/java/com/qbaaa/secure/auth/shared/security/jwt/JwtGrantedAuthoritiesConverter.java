@@ -1,4 +1,4 @@
-package com.qbaaa.secure.auth.shared.config.security.jwt;
+package com.qbaaa.secure.auth.shared.security.jwt;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import java.util.Collection;
@@ -8,7 +8,8 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-public class CustomJwtConverter implements Converter<DecodedJWT, Collection<GrantedAuthority>> {
+public class JwtGrantedAuthoritiesConverter
+    implements Converter<DecodedJWT, Collection<GrantedAuthority>> {
 
   private static final String AUTHORITY_PREFIX = "ROLE_";
   private static final String CLAIM_ROLES = "roles";
@@ -19,12 +20,19 @@ public class CustomJwtConverter implements Converter<DecodedJWT, Collection<Gran
     var domain = jwt.getClaim(CLAIM_DOMAIN).asString();
     var roles = jwt.getClaim(CLAIM_ROLES).asList(String.class);
 
-    if (domain == null || roles == null) {
+    if (domain == null && roles == null) {
       return List.of();
     }
 
     return roles.stream()
-        .map(role -> new SimpleGrantedAuthority(AUTHORITY_PREFIX + domain + "__" + role))
+        .map(role -> new SimpleGrantedAuthority(AUTHORITY_PREFIX + getDomain(domain) + role))
         .collect(Collectors.toList());
+  }
+
+  private String getDomain(String domain) {
+    if (domain == null) {
+      return "";
+    }
+    return domain + "__";
   }
 }

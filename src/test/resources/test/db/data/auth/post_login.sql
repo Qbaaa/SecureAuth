@@ -4,21 +4,23 @@ VALUES (100, 'test-domain', 300, 600, 180, 3600,
         '2025-03-25 22:15:00', '2025-03-25 22:15:00')
 ;
 
-INSERT INTO secureauth."user" (id, domain_id, username, email, is_active, created_at, updated_at,
-                               failed_login_attempts, last_failed_login_time)
-VALUES (101, 100, 'user001', 'user001@test.com', true,
+INSERT INTO secureauth."user" (id, domain_id, username, email, is_active, is_multifactor_auth_enabled, multifactor_auth_type,
+                               created_at, updated_at, failed_login_attempts, last_failed_login_time)
+VALUES (101, 100, 'user001', 'user001@test.com', true, false, null,
         '2025-03-25 22:30:00', '2025-03-25 22:30:00', 0, null)
-     , (102, 100, 'user002', 'user002@test.com', true,
+     , (102, 100, 'user002', 'user002@test.com', true, false, null,
         '2025-03-25 22:35:00', '2025-03-25 22:35:00', 0, null)
-     , (103, 100, 'user003NoActive', 'user003@test.com', false,
+     , (103, 100, 'user003NoActive', 'user003@test.com', false, false, null,
         '2025-05-29 22:35:00', '2025-05-29 22:35:00',0, null)
-     , (104, 100, 'user004', 'user004@test.com', true,
+     , (104, 100, 'user004', 'user004@test.com', true, false, null,
         '2025-03-27 22:35:00', '2025-03-28 22:35:00', 0, null)
-     , (105, 100, 'userLockAccount', 'user005@test.com', true,
+     , (105, 100, 'userLockAccount', 'user005@test.com', true, false, null,
         '2025-03-27 22:35:00', '2025-03-28 22:35:00', 3, CURRENT_TIMESTAMP)
-     , (106, 100, 'userLockClean', 'user006@test.com', true,
+     , (106, 100, 'userLockClean', 'user006@test.com', true, false, null,
         '2025-03-27 22:35:00', '2025-03-28 22:35:00', 2, CURRENT_TIMESTAMP)
-     , (107, 100, 'userLockIncrease', 'user007@test.com', true,
+     , (107, 100, 'userLockIncrease', 'user007@test.com', true, false, null,
+        '2025-03-27 22:35:00', '2025-03-28 22:35:00', 2, CURRENT_TIMESTAMP)
+     , (108, 100, 'userMfa', 'user008@test.com', true, true, 'SMS',
         '2025-03-27 22:35:00', '2025-03-28 22:35:00', 2, CURRENT_TIMESTAMP)
 ;
 
@@ -36,6 +38,8 @@ VALUES (1, 101, '$2a$10$Di3k1j1pr9LaAPvQi2y5XekxS0SB1ZxSp.rMSP129deGSqDQamf12', 
      , (6, 106, '$2a$10$DmZD6S035DEW3nsbJYb3zOdnHWohNzL8bq60auttuwQu/X36pdLky', -- secretUser002
         '2025-03-27 22:35:00', '2025-03-27 22:35:00')
      , (7, 107, '$2a$10$DmZD6S035DEW3nsbJYb3zOdnHWohNzL8bq60auttuwQu/X36pdLky', -- secretUser002
+        '2025-03-27 22:35:00', '2025-03-27 22:35:00')
+     , (8, 108, '$2a$10$DmZD6S035DEW3nsbJYb3zOdnHWohNzL8bq60auttuwQu/X36pdLky', -- secretUser002
         '2025-03-27 22:35:00', '2025-03-27 22:35:00')
 ;
 

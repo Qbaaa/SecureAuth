@@ -1,11 +1,11 @@
 package com.qbaaa.secure.auth.shared.config;
 
-import com.qbaaa.secure.auth.shared.config.security.UsernamePasswordAuthProvider;
-import com.qbaaa.secure.auth.shared.config.security.jwt.CustomJwtAuthenticationFilter;
-import com.qbaaa.secure.auth.shared.config.security.jwt.CustomJwtAuthenticationProvider;
-import com.qbaaa.secure.auth.shared.config.security.jwt.CustomJwtConverter;
-import com.qbaaa.secure.auth.shared.config.security.jwt.JwtService;
-import com.qbaaa.secure.auth.shared.config.security.jwt.Role;
+import com.qbaaa.secure.auth.shared.security.UsernamePasswordAuthProvider;
+import com.qbaaa.secure.auth.shared.security.jwt.CustomJwtAuthenticationFilter;
+import com.qbaaa.secure.auth.shared.security.jwt.CustomJwtAuthenticationProvider;
+import com.qbaaa.secure.auth.shared.security.jwt.JwtGrantedAuthoritiesConverter;
+import com.qbaaa.secure.auth.shared.security.jwt.JwtService;
+import com.qbaaa.secure.auth.shared.security.jwt.Role;
 import com.qbaaa.secure.auth.user.domain.service.PasswordService;
 import com.qbaaa.secure.auth.user.domain.service.UserService;
 import java.util.List;
@@ -70,6 +70,8 @@ public class WebSecurityConfig {
                     .permitAll()
                     .requestMatchers("/admin/domains")
                     .hasRole("master__" + Role.ADMIN.name())
+                    .requestMatchers("/domains/*/auth/login/mfa")
+                    .hasRole(Role.PENDING_LOGIN_MFA.name())
                     .requestMatchers("/domains/*/auth/logout")
                     .authenticated()
                     .anyRequest()
@@ -89,7 +91,7 @@ public class WebSecurityConfig {
 
   @Bean
   public AuthenticationProvider customJwtAuthenticationProvider(JwtService jwtService) {
-    return new CustomJwtAuthenticationProvider(jwtService, new CustomJwtConverter());
+    return new CustomJwtAuthenticationProvider(jwtService, new JwtGrantedAuthoritiesConverter());
   }
 
   @Bean

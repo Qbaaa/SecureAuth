@@ -3,6 +3,7 @@ package com.qbaaa.secure.auth.domain.infrastructure.entity;
 import com.qbaaa.secure.auth.shared.audit.entity.AuditDataEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -38,7 +39,7 @@ public class KeyEntity extends AuditDataEntity {
   @Column(nullable = false)
   private String privateKey;
 
-  @OneToOne
+  @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "domain_id", nullable = false)
   private DomainEntity domain;
 

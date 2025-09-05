@@ -21,8 +21,8 @@ VALUES (102, 100, 'RSA',
         '2025-04-15 16:01:00', '2025-04-15 16:01:00');
 ;
 
-INSERT INTO secureauth."user" (id, domain_id, username, email, is_active, created_at, updated_at)
-VALUES (401, 100, 'user001', 'user001@test.com', false,
+INSERT INTO secureauth."user" (id, domain_id, username, email, is_active, is_multifactor_auth_enabled, created_at, updated_at)
+VALUES (401, 100, 'user001', 'user001@test.com', false, false,
         '2025-03-25 22:30:00', '2025-03-25 22:30:00')
 ;
 

@@ -1,4 +1,4 @@
-package com.qbaaa.secure.auth.shared.config.security.jwt;
+package com.qbaaa.secure.auth.shared.security.jwt;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import java.util.Collection;

@@ -7,7 +7,7 @@ import com.qbaaa.secure.auth.config.time.FakeTimeProvider;
 import com.qbaaa.secure.auth.config.time.FakeTimeProviderConfig;
 import com.qbaaa.secure.auth.repository.EmailTokenRepositoryTest;
 import com.qbaaa.secure.auth.repository.UserRepositoryTest;
-import com.qbaaa.secure.auth.shared.config.security.jwt.JwtService;
+import com.qbaaa.secure.auth.shared.security.jwt.JwtService;
 import com.qbaaa.secure.auth.user.infrastructure.entity.EmailVerificationTokenEntity;
 import com.qbaaa.secure.auth.user.infrastructure.entity.UserEntity;
 import java.time.Instant;

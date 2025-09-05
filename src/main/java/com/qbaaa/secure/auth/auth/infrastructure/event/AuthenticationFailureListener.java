@@ -1,6 +1,6 @@
 package com.qbaaa.secure.auth.auth.infrastructure.event;
 
-import com.qbaaa.secure.auth.shared.config.security.CustomUsernamePasswordAuthenticationToken;
+import com.qbaaa.secure.auth.shared.security.CustomUsernamePasswordAuthenticationToken;
 import com.qbaaa.secure.auth.user.domain.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -21,8 +21,13 @@ public class AuthenticationFailureListener {
     if (auth instanceof CustomUsernamePasswordAuthenticationToken usernamePasswordToken) {
       var username = (String) usernamePasswordToken.getPrincipal();
       var domainName = (String) usernamePasswordToken.getEnvironment();
-
-      userService.recordFailedLoginAttemptIfExists(domainName, username);
+      userService
+          .findUserInDomain(domainName, username)
+          .ifPresent(
+              user -> {
+                userService.recordFailedLoginAttempt(user);
+                userService.assertUserNotLocked(domainName, user);
+              });
     }
   }
 }

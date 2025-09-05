@@ -1,4 +1,4 @@
-package com.qbaaa.secure.auth.shared.config.security.jwt;
+package com.qbaaa.secure.auth.shared.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -8,6 +8,7 @@ import com.qbaaa.secure.auth.auth.infrastructure.dto.ClaimJwtDto;
 import com.qbaaa.secure.auth.domain.domian.service.KeyService;
 import com.qbaaa.secure.auth.shared.config.time.TimeProvider;
 import com.qbaaa.secure.auth.shared.util.IssuerUtils;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +67,19 @@ public class JwtService {
         .withIssuer(IssuerUtils.buildIssuer(baseUrl, domainName))
         .withClaim(CLAIM_USERNAME, username)
         .withExpiresAt(timestamp.plusSeconds(emailTokenValidity))
+        .sign(algorithm);
+  }
+
+  public String createMfaToken(String baseUrl, String domainName, String username) {
+    var privateKey = keyService.getPrivateKey(domainName);
+    var algorithm = Algorithm.RSA256(null, privateKey);
+    var timestamp = timeProvider.getTimestamp();
+
+    return JWT.create()
+        .withIssuer(IssuerUtils.buildIssuer(baseUrl, domainName))
+        .withClaim(CLAIM_USERNAME, username)
+        .withClaim(CLAIM_ROLES, List.of(Role.PENDING_LOGIN_MFA.name()))
+        .withExpiresAt(timestamp.plusSeconds(60L))
         .sign(algorithm);
   }
 

@@ -4,7 +4,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.qbaaa.secure.auth.auth.api.dto.RefreshTokenRequest;
 import com.qbaaa.secure.auth.auth.domian.service.RefreshTokenService;
 import com.qbaaa.secure.auth.auth.domian.service.SessionService;
-import com.qbaaa.secure.auth.shared.config.security.jwt.JwtService;
+import com.qbaaa.secure.auth.shared.security.jwt.JwtService;
 import com.qbaaa.secure.auth.shared.util.IssuerUtils;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

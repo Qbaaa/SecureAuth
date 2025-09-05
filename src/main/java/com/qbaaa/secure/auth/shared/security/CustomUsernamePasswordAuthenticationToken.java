@@ -1,4 +1,4 @@
-package com.qbaaa.secure.auth.shared.config.security;
+package com.qbaaa.secure.auth.shared.security;
 
 import java.util.Collection;
 import lombok.Getter;

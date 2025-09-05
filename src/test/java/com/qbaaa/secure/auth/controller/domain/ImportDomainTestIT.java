@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qbaaa.secure.auth.auth.api.dto.LoginRequest;
+import com.qbaaa.secure.auth.auth.api.dto.TokenResponse;
 import com.qbaaa.secure.auth.auth.usecase.strategy.LoginUseCaseStrategy;
 import com.qbaaa.secure.auth.config.ContainerConfiguration;
 import com.qbaaa.secure.auth.repository.DomainRepositoryTest;
@@ -74,7 +75,7 @@ class ImportDomainTestIT {
           () -> Assertions.assertEquals(0, userRepositoryTest.countByDomainName(addingDomain)));
 
       var loginRequest = new LoginRequest("user001", "secretUser001");
-      var token = loginUseCaseStrategy.authenticate("master", "http://localhost", loginRequest);
+      var auth = loginUseCaseStrategy.authenticate("master", "http://localhost", loginRequest);
 
       var file =
           new File(
@@ -86,34 +87,37 @@ class ImportDomainTestIT {
               MediaType.APPLICATION_JSON_VALUE,
               new FileInputStream(file));
 
-      // when
-      mockMvc
-          .perform(
-              MockMvcRequestBuilders.multipart(API_POST_IMPORT_DOMAIN)
-                  .file(fileUpload)
-                  .header(HttpHeaders.AUTHORIZATION, "Bearer " + token.accessToken()))
+      if (auth instanceof TokenResponse token) {
+        // when
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.multipart(API_POST_IMPORT_DOMAIN)
+                    .file(fileUpload)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token.accessToken()))
 
-          // then
-          .andExpect(status().isOk());
+            // then
+            .andExpect(status().isOk());
 
-      assertAll(
-          "CHECK TABLES DATA AFTER IMPORT DOMAIN",
-          () -> Assertions.assertEquals(3, domainRepositoryTest.count()),
-          () -> Assertions.assertEquals(2, roleRepositoryTest.countByDomainName(addingDomain)),
-          () -> Assertions.assertEquals(2, userRepositoryTest.countByDomainName(addingDomain)),
-          () -> {
-            var addingUser = userRepositoryTest.findByDomainNameAndUsername(addingDomain, "admin");
-            Assertions.assertTrue(addingUser.isPresent());
-            Assertions.assertTrue(addingUser.get().getIsActive());
-            Assertions.assertEquals(1, addingUser.get().getRoles().size());
-          },
-          () -> {
-            var addingUser =
-                userRepositoryTest.findByDomainNameAndUsername(addingDomain, "user001");
-            Assertions.assertTrue(addingUser.isPresent());
-            Assertions.assertFalse(addingUser.get().getIsActive());
-            Assertions.assertEquals(1, addingUser.get().getRoles().size());
-          });
+        assertAll(
+            "CHECK TABLES DATA AFTER IMPORT DOMAIN",
+            () -> Assertions.assertEquals(3, domainRepositoryTest.count()),
+            () -> Assertions.assertEquals(2, roleRepositoryTest.countByDomainName(addingDomain)),
+            () -> Assertions.assertEquals(2, userRepositoryTest.countByDomainName(addingDomain)),
+            () -> {
+              var addingUser =
+                  userRepositoryTest.findByDomainNameAndUsername(addingDomain, "admin");
+              Assertions.assertTrue(addingUser.isPresent());
+              Assertions.assertTrue(addingUser.get().getIsActive());
+              Assertions.assertEquals(1, addingUser.get().getRoles().size());
+            },
+            () -> {
+              var addingUser =
+                  userRepositoryTest.findByDomainNameAndUsername(addingDomain, "user001");
+              Assertions.assertTrue(addingUser.isPresent());
+              Assertions.assertFalse(addingUser.get().getIsActive());
+              Assertions.assertEquals(1, addingUser.get().getRoles().size());
+            });
+      }
 
     } catch (Exception e) {
       Assertions.fail("ERROR: " + e.getMessage());

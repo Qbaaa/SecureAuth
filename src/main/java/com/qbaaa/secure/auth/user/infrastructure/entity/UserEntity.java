@@ -4,9 +4,12 @@ import com.qbaaa.secure.auth.auth.infrastructure.entity.RefreshTokenEntity;
 import com.qbaaa.secure.auth.auth.infrastructure.entity.SessionEntity;
 import com.qbaaa.secure.auth.domain.infrastructure.entity.DomainEntity;
 import com.qbaaa.secure.auth.shared.audit.entity.AuditDataEntity;
+import com.qbaaa.secure.auth.user.domain.enums.MfaType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,6 +27,8 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(
@@ -54,6 +59,12 @@ public class UserEntity extends AuditDataEntity {
 
   private LocalDateTime lastFailedLoginTime;
 
+  private Boolean isMultifactorAuthEnabled;
+
+  @Enumerated(EnumType.STRING)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+  private MfaType multifactorAuthType;
+
   @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
   private PasswordEntity password;
 
@@ -62,6 +73,9 @@ public class UserEntity extends AuditDataEntity {
 
   @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
   private EmailVerificationTokenEntity emailVerificationToken;
+
+  @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+  private OtpEntity otp;
 
   @ManyToOne
   @JoinColumn(name = "domain_id", nullable = false)
@@ -80,6 +94,10 @@ public class UserEntity extends AuditDataEntity {
 
   public Optional<LocalDateTime> getLastFailedLoginTime() {
     return Optional.ofNullable(lastFailedLoginTime);
+  }
+
+  public Optional<OtpEntity> getOtp() {
+    return Optional.ofNullable(otp);
   }
 
   @Override

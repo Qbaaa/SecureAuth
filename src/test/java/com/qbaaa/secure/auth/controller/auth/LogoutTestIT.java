@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qbaaa.secure.auth.auth.api.dto.LoginRequest;
 import com.qbaaa.secure.auth.auth.api.dto.RefreshTokenRequest;
+import com.qbaaa.secure.auth.auth.api.dto.TokenResponse;
 import com.qbaaa.secure.auth.auth.usecase.strategy.LoginUseCaseStrategy;
 import com.qbaaa.secure.auth.config.ContainerConfiguration;
 import com.qbaaa.secure.auth.repository.RefreshTokenRepositoryTest;
@@ -73,39 +74,39 @@ class LogoutTestIT {
     try {
       // given
       var loginRequest = new LoginRequest(username, password);
-      var token = loginUseCaseStrategy.authenticate(domainName, "http://localhost", loginRequest);
+      var auth = loginUseCaseStrategy.authenticate(domainName, "http://localhost", loginRequest);
 
       assertAll(
           "CHECK TABLES DATA BEFORE LOGOUT",
           () -> Assertions.assertEquals(1, refreshTokenRepositoryTest.countByUsername(username)),
           () -> Assertions.assertEquals(1, sessionRepositoryTest.countByUsername(username)));
 
-      var refreshTokenRequest = new RefreshTokenRequest(token.refreshToken());
+      if (auth instanceof TokenResponse token) {
+        var refreshTokenRequest = new RefreshTokenRequest(token.refreshToken());
+        // when
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.post(API_POST_LOGOUT, domainName)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token.accessToken())
+                    .content(objectMapper.writeValueAsString(refreshTokenRequest))
+                    .contentType(MediaType.APPLICATION_JSON_VALUE))
 
-      // when
-      mockMvc
-          .perform(
-              MockMvcRequestBuilders.post(API_POST_LOGOUT, domainName)
-                  .header(HttpHeaders.AUTHORIZATION, "Bearer " + token.accessToken())
-                  .content(objectMapper.writeValueAsString(refreshTokenRequest))
-                  .contentType(MediaType.APPLICATION_JSON_VALUE))
+            // then
+            .andExpect(
+                result -> {
+                  Assertions.assertEquals(
+                      HttpStatus.NO_CONTENT.value(), result.getResponse().getStatus());
 
-          // then
-          .andExpect(
-              result -> {
-                Assertions.assertEquals(
-                    HttpStatus.NO_CONTENT.value(), result.getResponse().getStatus());
-
-                assertAll(
-                    "CHECK TABLES DATA AFTER LOGOUT",
-                    () ->
-                        Assertions.assertEquals(
-                            0, refreshTokenRepositoryTest.countByUsername(username)),
-                    () ->
-                        Assertions.assertEquals(
-                            0, sessionRepositoryTest.countByUsername(username)));
-              });
-
+                  assertAll(
+                      "CHECK TABLES DATA AFTER LOGOUT",
+                      () ->
+                          Assertions.assertEquals(
+                              0, refreshTokenRepositoryTest.countByUsername(username)),
+                      () ->
+                          Assertions.assertEquals(
+                              0, sessionRepositoryTest.countByUsername(username)));
+                });
+      }
     } catch (Exception e) {
       Assertions.fail("ERROR: " + e.getMessage());
     }
@@ -120,38 +121,40 @@ class LogoutTestIT {
       var username = "user001";
       var password = "secretUser001";
       var loginRequest = new LoginRequest(username, password);
-      var token = loginUseCaseStrategy.authenticate("master", "http://localhost", loginRequest);
+      var auth = loginUseCaseStrategy.authenticate("master", "http://localhost", loginRequest);
 
       assertAll(
           "CHECK TABLES DATA BEFORE LOGOUT",
           () -> Assertions.assertEquals(1, refreshTokenRepositoryTest.countByUsername(username)),
           () -> Assertions.assertEquals(1, sessionRepositoryTest.countByUsername(username)));
 
-      var refreshTokenRequest = new RefreshTokenRequest(token.refreshToken());
+      if (auth instanceof TokenResponse token) {
+        var refreshTokenRequest = new RefreshTokenRequest(token.refreshToken());
 
-      // when
-      mockMvc
-          .perform(
-              MockMvcRequestBuilders.post(API_POST_LOGOUT, "test-domain")
-                  .header(HttpHeaders.AUTHORIZATION, "Bearer " + token.accessToken())
-                  .content(objectMapper.writeValueAsString(refreshTokenRequest))
-                  .contentType(MediaType.APPLICATION_JSON_VALUE))
+        // when
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.post(API_POST_LOGOUT, "test-domain")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token.accessToken())
+                    .content(objectMapper.writeValueAsString(refreshTokenRequest))
+                    .contentType(MediaType.APPLICATION_JSON_VALUE))
 
-          // then
-          .andExpect(
-              result -> {
-                Assertions.assertEquals(
-                    HttpStatus.FORBIDDEN.value(), result.getResponse().getStatus());
+            // then
+            .andExpect(
+                result -> {
+                  Assertions.assertEquals(
+                      HttpStatus.FORBIDDEN.value(), result.getResponse().getStatus());
 
-                assertAll(
-                    "CHECK TABLES DATA AFTER LOGOUT",
-                    () ->
-                        Assertions.assertEquals(
-                            1, refreshTokenRepositoryTest.countByUsername(username)),
-                    () ->
-                        Assertions.assertEquals(
-                            1, sessionRepositoryTest.countByUsername(username)));
-              });
+                  assertAll(
+                      "CHECK TABLES DATA AFTER LOGOUT",
+                      () ->
+                          Assertions.assertEquals(
+                              1, refreshTokenRepositoryTest.countByUsername(username)),
+                      () ->
+                          Assertions.assertEquals(
+                              1, sessionRepositoryTest.countByUsername(username)));
+                });
+      }
 
     } catch (Exception e) {
       Assertions.fail("ERROR: " + e.getMessage());

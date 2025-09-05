@@ -106,23 +106,19 @@ public class UserService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void recordFailedLoginAttemptIfExists(String domainName, String username) {
-    findUserInDomain(domainName, username)
-        .ifPresent(
-            u -> {
-              u.setFailedLoginAttempts(u.getFailedLoginAttempts() + 1);
-              u.setLastFailedLoginTime(timeProvider.getLocalDateTimeNow());
-              userRepository.save(u);
-            });
+  public void recordFailedLoginAttempt(UserEntity user) {
+
+    user.setFailedLoginAttempts(user.getFailedLoginAttempts() + 1);
+    user.setLastFailedLoginTime(timeProvider.getLocalDateTimeNow());
+    user.setOtp(null);
+    userRepository.save(user);
   }
 
   @Transactional
-  public void resetFailedLoginAttempts(String domainName, String username) {
-    final UserEntity user =
-        findUserInDomain(domainName, username)
-            .orElseThrow(() -> new EntityNotFoundException("User not found in domain"));
+  public void resetFailedLoginAttempts(UserEntity user) {
     user.setFailedLoginAttempts(0);
     user.setLastFailedLoginTime(null);
+    user.setOtp(null);
     userRepository.save(user);
   }
 

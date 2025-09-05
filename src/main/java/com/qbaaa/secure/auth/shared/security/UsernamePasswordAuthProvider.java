@@ -1,4 +1,4 @@
-package com.qbaaa.secure.auth.shared.config.security;
+package com.qbaaa.secure.auth.shared.security;
 
 import com.qbaaa.secure.auth.user.domain.service.PasswordService;
 import com.qbaaa.secure.auth.user.domain.service.UserService;
@@ -47,7 +47,6 @@ public class UsernamePasswordAuthProvider implements AuthenticationProvider {
     }
 
     var user = userOpt.get();
-    userService.assertUserNotLocked(domainName, user);
     if (!passwordService.validatePassword(user, password)) {
       throw new BadCredentialsException("Bad username or password");
     }
