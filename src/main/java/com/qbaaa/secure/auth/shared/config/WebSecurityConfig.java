@@ -36,6 +36,8 @@ public class WebSecurityConfig {
     "/domains/*/auth/token",
     "/domains/*/users/register",
     "/domains/*/users/account/activate",
+    "/domains/*/users/reset-password",
+    "/domains/*/auth/code",
   };
 
   @Bean

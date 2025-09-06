@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OtpService {
 
   private final TimeProvider timeProvider;
-  private final OptRepository optRepository;
+  private final OptRepository otpRepository;
   private final OtpProvider otpProvider;
   private final List<MfaProvider> mfaProviders;
 
@@ -39,7 +39,7 @@ public class OtpService {
     opt.setCreatedAt(timeProvider.getLocalDateTimeNow());
     opt.setUser(user);
 
-    return optRepository.save(opt);
+    return otpRepository.save(opt);
   }
 
   private void sendOtp(MfaType type, String recipient, String otp) {

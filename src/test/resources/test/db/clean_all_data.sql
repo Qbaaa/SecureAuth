@@ -7,3 +7,4 @@ TRUNCATE TABLE secureauth.session CASCADE;
 TRUNCATE TABLE secureauth.refresh_token CASCADE;
 TRUNCATE TABLE secureauth.email_verification_token CASCADE;
 TRUNCATE TABLE secureauth.domain CASCADE;
+TRUNCATE TABLE secureauth.otp CASCADE;

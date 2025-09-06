@@ -2,7 +2,9 @@ package com.qbaaa.secure.auth.multifactorauth.api.controller;
 
 import com.qbaaa.secure.auth.auth.api.dto.TokenResponse;
 import com.qbaaa.secure.auth.multifactorauth.api.dto.MfaRequest;
+import com.qbaaa.secure.auth.multifactorauth.api.dto.OperationRequest;
 import com.qbaaa.secure.auth.multifactorauth.usecase.CreateAuthTokenUseCase;
+import com.qbaaa.secure.auth.multifactorauth.usecase.TriggerOtpUseCase;
 import com.qbaaa.secure.auth.shared.util.UrlUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MfaController {
 
   private final CreateAuthTokenUseCase createAuthTokenUseCase;
+  private final TriggerOtpUseCase triggerOtpUseCase;
 
   @Operation(security = @SecurityRequirement(name = "Authorization"))
   @PostMapping("login/mfa")
@@ -34,5 +37,12 @@ public class MfaController {
 
     return ResponseEntity.ok(
         createAuthTokenUseCase.createAuthToken(mfaRequest, baseUrl, domainName));
+  }
+
+  @PostMapping("code")
+  public ResponseEntity<String> generateCode(
+      @PathVariable String domainName, @RequestBody OperationRequest operationRequest) {
+
+    return ResponseEntity.ok(triggerOtpUseCase.execution(domainName, operationRequest));
   }
 }

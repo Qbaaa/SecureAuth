@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.password.CompromisedPasswordChecker;
-import org.springframework.security.authentication.password.CompromisedPasswordException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +34,6 @@ public class UserService {
   private final PasswordService passwordService;
   private final RoleService roleService;
   private final UserMapper userMapper;
-  private final CompromisedPasswordChecker compromisedPasswordChecker;
   private final TimeProvider timeProvider;
   private final AccountLockedProperties accountLockedProperties;
 
@@ -83,7 +80,7 @@ public class UserService {
       throw new EmailAlreadyExistsException(
           "Email is already in use. Please choose a different one.");
     }
-    validatePassword(registerRequest.password());
+    passwordService.validatePassword(registerRequest.password());
 
     var assignRolesToUser = roleService.getRolesToRegisterUser(domain.getName());
     var userEntity =
@@ -135,18 +132,20 @@ public class UserService {
             });
   }
 
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public void cleanOtp(UserEntity user) {
+    var managedUser =
+        userRepository
+            .findById(user.getId())
+            .orElseThrow(() -> new IllegalStateException("User not found when cleaning OTP"));
+
+    managedUser.setOtp(null);
+  }
+
   private Duration calculateNextLockDuration(final UserEntity user) {
     if (user.getFailedLoginAttempts() < accountLockedProperties.getAttempt()) {
       return Duration.ZERO;
     }
     return Duration.ofMinutes(accountLockedProperties.getTime());
-  }
-
-  private void validatePassword(final String password) {
-    if (!password.isBlank() && compromisedPasswordChecker.check(password).isCompromised()) {
-      throw new CompromisedPasswordException(
-          "The password unsafe because it's well-known to hackers. "
-              + "Please choose a different password that's harder to guess");
-    }
   }
 }
